@@ -7,85 +7,27 @@
 @import "@fontsource/dm-sans/600.css";
 @import "@fontsource/dm-sans/700.css";
 
-/* Design System - Minimalist Portfolio with Pink Accent */
+/* Design System - Developer Portfolio Dark Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 8%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
-
-    --primary: 336 100% 64%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 20%;
-
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-
-    --accent: 336 100% 64%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 336 100% 64%;
-
-    --radius: 0.75rem;
-
-    /* Custom tokens */
-    --gray-50: 0 0% 98%;
-    --gray-100: 0 0% 96%;
-    --gray-200: 0 0% 90%;
-    --gray-300: 0 0% 80%;
-    --gray-400: 0 0% 60%;
-    --gray-500: 0 0% 45%;
-    --gray-600: 0 0% 32%;
-    --gray-700: 0 0% 20%;
-    --gray-800: 0 0% 12%;
-    --gray-900: 0 0% 8%;
-
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.03);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.05), 0 2px 4px -2px hsl(0 0% 0% / 0.05);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.08), 0 4px 6px -4px hsl(0 0% 0% / 0.05);
-    --shadow-featured: 0 20px 40px -10px hsl(336 100% 64% / 0.15);
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 20%;
-    --sidebar-primary: 336 100% 64%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 20%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 336 100% 64%;
-  }
-
-  .dark {
-    --background: 0 0% 5%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 95%;
 
-    --card: 0 0% 8%;
+    --card: 0 0% 11%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 8%;
+    --popover: 0 0% 11%;
     --popover-foreground: 0 0% 95%;
 
     --primary: 336 100% 64%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary-foreground: 0 0% 80%;
 
     --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    --muted-foreground: 0 0% 55%;
 
     --accent: 336 100% 64%;
     --accent-foreground: 0 0% 100%;
@@ -97,12 +39,26 @@
     --input: 0 0% 18%;
     --ring: 336 100% 64%;
 
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 0 0% 90%;
+    --radius: 1rem;
+
+    /* Custom tokens */
+    --gray-50: 0 0% 95%;
+    --gray-100: 0 0% 85%;
+    --gray-200: 0 0% 70%;
+    --gray-300: 0 0% 55%;
+    --gray-400: 0 0% 45%;
+    --gray-500: 0 0% 35%;
+    --gray-600: 0 0% 25%;
+    --gray-700: 0 0% 18%;
+    --gray-800: 0 0% 11%;
+    --gray-900: 0 0% 7%;
+
+    --sidebar-background: 0 0% 11%;
+    --sidebar-foreground: 0 0% 80%;
     --sidebar-primary: 336 100% 64%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-accent-foreground: 0 0% 80%;
     --sidebar-border: 0 0% 18%;
     --sidebar-ring: 336 100% 64%;
   }
@@ -124,56 +80,65 @@
 }
 
 @layer components {
-  .card-featured {
-    @apply relative overflow-hidden rounded-2xl border-2 border-primary/20 bg-card p-6 transition-all duration-300;
-    box-shadow: var(--shadow-lg);
+  /* Bento Card Styles */
+  .bento-card {
+    @apply relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300;
   }
 
-  .card-featured:hover {
-    @apply border-primary/40;
-    box-shadow: var(--shadow-featured);
-    transform: translateY(-4px);
+  .bento-card:hover {
+    @apply border-gray-600;
+    transform: translateY(-2px);
   }
 
-  .card-secondary {
-    @apply rounded-xl border border-border bg-card p-5 transition-all duration-200;
-    box-shadow: var(--shadow-sm);
+  .bento-card-featured {
+    @apply relative overflow-hidden rounded-2xl border border-primary/30 bg-card p-6 transition-all duration-300;
   }
 
-  .card-secondary:hover {
-    box-shadow: var(--shadow-md);
+  .bento-card-featured:hover {
+    @apply border-primary/50;
+    transform: translateY(-2px);
   }
 
+  /* Social Icon Button */
+  .social-icon-btn {
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition-all duration-200;
+  }
+
+  .social-icon-btn:hover {
+    @apply border-primary/50 bg-primary/10 text-primary;
+  }
+
+  /* Primary Button */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200;
   }
 
   .btn-primary:hover {
+    @apply border-primary/50 bg-primary/10 text-primary;
+  }
+
+  /* Accent Button */
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all duration-200;
+  }
+
+  .btn-accent:hover {
     @apply opacity-90;
     transform: translateY(-1px);
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-secondary-foreground transition-all duration-200;
+  /* Tech Stack Tag */
+  .tech-tag {
+    @apply inline-flex items-center gap-2 text-sm text-muted-foreground;
   }
 
-  .btn-secondary:hover {
-    @apply border-primary/50 text-primary;
+  .tech-tag::before {
+    content: "";
+    @apply h-1.5 w-1.5 rounded-full bg-primary;
   }
 
-  .link-social {
-    @apply inline-flex items-center justify-center rounded-full bg-secondary p-3 text-muted-foreground transition-all duration-200;
-  }
-
-  .link-social:hover {
-    @apply bg-primary/10 text-primary;
-  }
-
-  .tag {
-    @apply inline-flex items-center rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground;
-  }
-
-  .section-title {
-    @apply text-xs font-semibold uppercase tracking-widest text-muted-foreground;
+  /* Section Label */
+  .section-label {
+    @apply text-xs font-medium uppercase tracking-wider text-muted-foreground;
   }
 }
