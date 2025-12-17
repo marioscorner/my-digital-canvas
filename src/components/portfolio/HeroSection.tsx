@@ -1,55 +1,67 @@
-import { Github, Linkedin, Instagram, Twitter, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
+import { FaGithub, FaLinkedin, FaInstagram, FaXTwitter } from "react-icons/fa6";
 import avatarPlaceholder from "@/assets/avatar-placeholder.png";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HeroSection = () => {
+  const { t } = useLanguage();
+
   // Editable content
-  const name = "Tu Nombre";
-  const intro = "un desarrollador de software con enfoque en la experiencia de usuario, animaciones e interacciones.";
-  const cta = "No dudes en contactarme si tienes algún proyecto en mente, o simplemente para saludar.";
+  const name = "Mario Gutiérrez González";
   const profileImage = avatarPlaceholder;
 
   // Editable links
   const socialLinks = [
-    { name: "GitHub", url: "https://github.com/tu-usuario", icon: Github },
-    { name: "LinkedIn", url: "https://linkedin.com/in/tu-usuario", icon: Linkedin },
-    { name: "Instagram", url: "https://instagram.com/tu-usuario", icon: Instagram },
-    { name: "Twitter", url: "https://x.com/tu-usuario", icon: Twitter },
+    { name: "GitHub", url: "https://github.com/marioscorner", icon: FaGithub },
+    {
+      name: "LinkedIn",
+      url: "https://linkedin.com/in/marioscorner",
+      icon: FaLinkedin,
+    },
+    {
+      name: "Instagram",
+      url: "https://instagram.com/marioscorner",
+      icon: FaInstagram,
+    },
+    { name: "Twitter", url: "https://x.com/elrincondehoid", icon: FaXTwitter },
   ];
-  const cvUrl = "/cv.pdf";
 
   return (
     <div className="bento-card flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
       <div className="flex-1 space-y-4">
-        <span className="section-label">welcome</span>
-        
+        <span className="section-label">{t.hero.welcome}</span>
+
         <div className="space-y-4">
           <p className="text-lg leading-relaxed text-foreground">
-            Hola, soy <span className="font-semibold">{name}</span>,{" "}
-            <span className="text-muted-foreground">{intro}</span>
+            {t.hero.greeting} <span className="font-semibold">{name}</span>,{" "}
+            <span className="text-muted-foreground">{t.hero.intro}</span>
           </p>
-          
-          <p className="text-sm text-muted-foreground">{cta}</p>
+
+          <p className="text-sm text-muted-foreground">{t.hero.cta}</p>
         </div>
 
         {/* Social Icons + CV */}
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          {socialLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="social-icon-btn"
-              aria-label={link.name}
-              title={link.name}
-            >
-              <link.icon className="h-5 w-5" />
-            </a>
-          ))}
+          {socialLinks.map((link) => {
+            const IconComponent = link.icon;
+            return (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon-btn"
+                aria-label={link.name}
+                title={link.name}
+              >
+                <IconComponent className="h-5 w-5" />
+              </a>
+            );
+          })}
 
-          <a href={cvUrl} download className="btn-primary ml-2">
+          <a href={t.cv.url} download className="btn-primary ml-2">
             <FileText className="h-4 w-4" />
-            Descargar CV
+            {t.hero.downloadCV}
           </a>
         </div>
       </div>
