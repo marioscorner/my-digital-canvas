@@ -1,66 +1,79 @@
-import ProfileSection from "@/components/portfolio/ProfileSection";
+import HeroSection from "@/components/portfolio/HeroSection";
+import AboutCard from "@/components/portfolio/AboutCard";
+import TechStackCard from "@/components/portfolio/TechStackCard";
 import FeaturedProject from "@/components/portfolio/FeaturedProject";
-import SecondaryLinks from "@/components/portfolio/SecondaryLinks";
-import ContactSection from "@/components/portfolio/ContactSection";
+import ContactCard from "@/components/portfolio/ContactCard";
+import SocialLinks from "@/components/portfolio/SocialLinks";
 
 const Index = () => {
   return (
     <>
-      {/* SEO Meta */}
-      <title>Tu Nombre | Portfolio Personal</title>
+      <title>Tu Nombre | Desarrollador Web</title>
       <meta
         name="description"
-        content="Portfolio personal de Tu Nombre. Desarrollador web especializado en React y TypeScript. Descubre mis proyectos y conecta conmigo."
+        content="Portfolio personal de Tu Nombre. Desarrollador web especializado en React y TypeScript."
       />
 
       <main className="min-h-screen bg-background">
-        <div className="container py-12 lg:py-20">
-          {/* Two-column layout */}
-          <div className="grid gap-12 lg:grid-cols-[320px_1fr] lg:gap-16">
-            {/* Left Column - Profile */}
-            <aside
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+          {/* Bento Grid Layout */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Hero - spans 2 columns */}
+            <div
+              className="md:col-span-2 animate-fade-in"
+              style={{ animationDelay: "0ms", opacity: 0 }}
+            >
+              <HeroSection />
+            </div>
+
+            {/* About Me */}
+            <div
               className="animate-fade-in"
               style={{ animationDelay: "100ms", opacity: 0 }}
             >
-              <div className="sticky top-8">
-                <ProfileSection />
-              </div>
-            </aside>
+              <AboutCard />
+            </div>
 
-            {/* Right Column - Projects & Links */}
-            <div className="space-y-8">
-              {/* Featured Project */}
-              <div
-                className="animate-slide-up"
-                style={{ animationDelay: "200ms", opacity: 0 }}
-              >
-                <FeaturedProject />
-              </div>
+            {/* Contact */}
+            <div
+              className="animate-fade-in"
+              style={{ animationDelay: "150ms", opacity: 0 }}
+            >
+              <ContactCard />
+            </div>
 
-              {/* Secondary Links */}
-              <div
-                className="animate-slide-up"
-                style={{ animationDelay: "300ms", opacity: 0 }}
-              >
-                <SecondaryLinks />
-              </div>
+            {/* Tech Stack */}
+            <div
+              className="animate-fade-in"
+              style={{ animationDelay: "200ms", opacity: 0 }}
+            >
+              <TechStackCard />
+            </div>
 
-              {/* Contact Section */}
-              <div
-                className="animate-slide-up"
-                style={{ animationDelay: "400ms", opacity: 0 }}
-              >
-                <ContactSection />
-              </div>
+            {/* Featured Project */}
+            <div
+              className="animate-fade-in"
+              style={{ animationDelay: "250ms", opacity: 0 }}
+            >
+              <FeaturedProject />
+            </div>
+
+            {/* Social Links - spans full width on mobile, 3 cols on desktop */}
+            <div
+              className="md:col-span-2 lg:col-span-3 animate-fade-in"
+              style={{ animationDelay: "300ms", opacity: 0 }}
+            >
+              <SocialLinks />
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-border py-8">
-          <div className="container">
+        <footer className="border-t border-border py-6">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <p className="text-center text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Tu Nombre. Todos los derechos reservados.
+              © {new Date().getFullYear()} · Hecho con{" "}
+              <span className="text-primary">♥</span> por Tu Nombre
             </p>
           </div>
         </footer>
