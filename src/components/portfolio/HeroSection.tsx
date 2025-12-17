@@ -1,4 +1,4 @@
-import { Github, Linkedin, Dribbble } from "lucide-react";
+import { Github, Linkedin, Instagram, Twitter, FileText } from "lucide-react";
 import avatarPlaceholder from "@/assets/avatar-placeholder.png";
 
 const HeroSection = () => {
@@ -9,9 +9,13 @@ const HeroSection = () => {
   const profileImage = avatarPlaceholder;
 
   // Editable links
-  const githubUrl = "https://github.com/tu-usuario";
-  const linkedinUrl = "https://linkedin.com/in/tu-usuario";
-  const dribbbleUrl = "https://dribbble.com/tu-usuario";
+  const socialLinks = [
+    { name: "GitHub", url: "https://github.com/tu-usuario", icon: Github },
+    { name: "LinkedIn", url: "https://linkedin.com/in/tu-usuario", icon: Linkedin },
+    { name: "Instagram", url: "https://instagram.com/tu-usuario", icon: Instagram },
+    { name: "Twitter", url: "https://x.com/tu-usuario", icon: Twitter },
+  ];
+  const cvUrl = "/cv.pdf";
 
   return (
     <div className="bento-card flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
@@ -27,38 +31,25 @@ const HeroSection = () => {
           <p className="text-sm text-muted-foreground">{cta}</p>
         </div>
 
-        {/* Social Icons */}
-        <div className="flex items-center gap-3 pt-2">
-          <a
-            href={githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-icon-btn"
-            aria-label="GitHub"
-          >
-            <Github className="h-5 w-5" />
-          </a>
-          <a
-            href={linkedinUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-icon-btn"
-            aria-label="LinkedIn"
-          >
-            <Linkedin className="h-5 w-5" />
-          </a>
-          <a
-            href={dribbbleUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-icon-btn"
-            aria-label="Dribbble"
-          >
-            <Dribbble className="h-5 w-5" />
-          </a>
+        {/* Social Icons + CV */}
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          {socialLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-icon-btn"
+              aria-label={link.name}
+              title={link.name}
+            >
+              <link.icon className="h-5 w-5" />
+            </a>
+          ))}
 
-          <a href="#contact" className="btn-primary ml-2">
-            Contactar
+          <a href={cvUrl} download className="btn-primary ml-2">
+            <FileText className="h-4 w-4" />
+            Descargar CV
           </a>
         </div>
       </div>
