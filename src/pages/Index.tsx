@@ -3,7 +3,6 @@ import AboutCard from "@/components/portfolio/AboutCard";
 import TechStackCard from "@/components/portfolio/TechStackCard";
 import FeaturedProject from "@/components/portfolio/FeaturedProject";
 import ContactCard from "@/components/portfolio/ContactCard";
-import SocialLinks from "@/components/portfolio/SocialLinks";
 
 const Index = () => {
   return (
@@ -56,14 +55,6 @@ const Index = () => {
               style={{ animationDelay: "250ms", opacity: 0 }}
             >
               <FeaturedProject />
-            </div>
-
-            {/* Social Links - spans full width on mobile, 3 cols on desktop */}
-            <div
-              className="md:col-span-2 lg:col-span-3 animate-fade-in"
-              style={{ animationDelay: "300ms", opacity: 0 }}
-            >
-              <SocialLinks />
             </div>
           </div>
         </div>
