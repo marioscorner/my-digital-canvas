@@ -6,6 +6,7 @@ services:
     container_name: traefik
     restart: unless-stopped
     command:
+      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
@@ -18,6 +19,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
@@ -49,17 +51,21 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.my-digital-canvas.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
-      - "traefik.http.routers.my-digital-canvas.entrypoints=websecure"
-      - "traefik.http.routers.my-digital-canvas.tls=true"
-      - "traefik.http.routers.my-digital-canvas.tls.certresolver=letsencrypt"
-      - "traefik.http.services.my-digital-canvas.loadbalancer.server.port=80"
-      # HTTP to HTTPS redirect
-      - "traefik.http.routers.my-digital-canvas-http.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
-      - "traefik.http.routers.my-digital-canvas-http.entrypoints=web"
-      - "traefik.http.routers.my-digital-canvas-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      
+      # Router HTTP (sin SSL, para pruebas y para challenge de Let's Encrypt)
+      - "traefik.http.routers.web-http.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
+      - "traefik.http.routers.web-http.entrypoints=web"
+      - "traefik.http.routers.web-http.service=web-service"
+      
+      # Router HTTPS (con SSL)
+      - "traefik.http.routers.web-https.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
+      - "traefik.http.routers.web-https.entrypoints=websecure"
+      - "traefik.http.routers.web-https.tls=true"
+      - "traefik.http.routers.web-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.web-https.service=web-service"
+      
+      # Servicio (apunta al puerto 80 del contenedor)
+      - "traefik.http.services.web-service.loadbalancer.server.port=80"
     networks:
       - web
 
