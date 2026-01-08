@@ -44,7 +44,7 @@ const ExperienceCard = () => {
         {workExperience.map((job, index) => (
           <div key={index} className="space-y-1">
             <div className="flex flex-col gap-0.5">
-              <p className="text-base font-semibold text-primary">
+              <p className="text-base font-semibold text-foreground">
                 {job.position[language]}
               </p>
               <p className="text-sm font-medium text-muted-foreground">{job.company}</p>

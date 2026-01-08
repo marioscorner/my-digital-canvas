@@ -235,7 +235,9 @@
 
   /* Section Label */
   .section-label {
-    @apply text-xs font-medium uppercase tracking-wider text-primary;
+    @apply text-xs font-medium uppercase tracking-wider;
+    color: hsl(var(--primary)) !important;
+    will-change: auto;
   }
 
   /* Footer con fondo opaco */
