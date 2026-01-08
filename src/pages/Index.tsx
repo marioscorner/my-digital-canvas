@@ -1,8 +1,11 @@
 import HeroSection from "@/components/portfolio/HeroSection";
 import AboutCard from "@/components/portfolio/AboutCard";
 import TechnologiesCard from "@/components/portfolio/TechnologiesCard";
-import TechStackCard from "@/components/portfolio/TechStackCard";
+import StatusCard from "@/components/portfolio/StatusCard";
 import ExperienceCard from "@/components/portfolio/ExperienceCard";
+import CertificationsCard from "@/components/portfolio/CertificationsCard";
+import LanguagesCard from "@/components/portfolio/LanguagesCard";
+import ProjectsCard from "@/components/portfolio/ProjectsCard";
 import FeaturedProject from "@/components/portfolio/FeaturedProject";
 import ContactCard from "@/components/portfolio/ContactCard";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -22,10 +25,16 @@ const Index = () => {
     document.title = t.meta.title;
 
     // Función helper para actualizar o crear meta tags
-    const updateMetaTag = (property: string, content: string, isProperty = false) => {
-      const selector = isProperty ? `meta[property="${property}"]` : `meta[name="${property}"]`;
+    const updateMetaTag = (
+      property: string,
+      content: string,
+      isProperty = false
+    ) => {
+      const selector = isProperty
+        ? `meta[property="${property}"]`
+        : `meta[name="${property}"]`;
       let meta = document.querySelector(selector) as HTMLMetaElement;
-      
+
       if (!meta) {
         meta = document.createElement("meta");
         if (isProperty) {
@@ -60,7 +69,9 @@ const Index = () => {
     updateMetaTag("twitter:image:alt", t.meta.title);
 
     // Canonical URL
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    let canonical = document.querySelector(
+      'link[rel="canonical"]'
+    ) as HTMLLinkElement;
     if (!canonical) {
       canonical = document.createElement("link");
       canonical.setAttribute("rel", "canonical");
@@ -71,19 +82,19 @@ const Index = () => {
 
   return (
     <>
-      <main className="min-h-screen bg-dot-pattern flex flex-col relative">
+      <main className="flex-1 bg-dot-pattern flex flex-col relative">
         {/* Theme and Language Toggles - Fixed position */}
         <div className="fixed top-4 right-4 z-50 flex gap-2">
           <LanguageToggle />
           <ThemeToggle />
         </div>
 
-        <div className="flex-1 flex items-center justify-center w-full px-4 py-4 sm:px-6 lg:px-6">
-          {/* Bento Grid Layout Premium - 12 columns */}
-          <div className="w-full max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-3 items-stretch">
-              {/* Columna Izquierda */}
-              <div className="flex flex-col gap-3 h-full">
+        <div className="flex-1 flex items-center justify-center w-full px-4 py-2 sm:px-6 lg:px-8">
+          {/* Bento Grid Layout - 3 columns */}
+          <div className="w-full max-w-[90rem]">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-stretch">
+              {/* Columna 1 - Contenido Principal */}
+              <div className="flex flex-col gap-2 h-full">
                 {/* 1. Welcome / Hero */}
                 <div
                   className="w-full animate-fade-in"
@@ -100,47 +111,74 @@ const Index = () => {
                   <AboutCard />
                 </div>
 
-                {/* 3. Featured Project + Contact (50% cada uno) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div
-                    className="w-full animate-fade-in"
-                    style={{ animationDelay: "200ms", opacity: 0 }}
-                  >
-                    <FeaturedProject />
-                  </div>
-                  <div
-                    className="w-full animate-fade-in"
-                    style={{ animationDelay: "250ms", opacity: 0 }}
-                  >
-                    <ContactCard />
-                  </div>
+                {/* 3. Projects */}
+                <div
+                  className="w-full animate-fade-in"
+                  style={{ animationDelay: "200ms", opacity: 0 }}
+                >
+                  <ProjectsCard />
                 </div>
               </div>
 
-              {/* Columna Derecha */}
-              <div className="flex flex-col gap-3 h-full">
+              {/* Columna 2 - Status, Contacto, Proyecto Destacado e Idiomas */}
+              <div className="flex flex-col gap-2 h-full">
                 {/* 1. Status */}
                 <div
                   className="w-full animate-fade-in"
                   style={{ animationDelay: "300ms", opacity: 0 }}
                 >
-                  <TechStackCard />
+                  <StatusCard />
                 </div>
 
-                {/* 2. Tech Stack */}
+                {/* 2. Contact */}
                 <div
                   className="w-full animate-fade-in"
                   style={{ animationDelay: "400ms", opacity: 0 }}
                 >
-                  <TechnologiesCard />
+                  <ContactCard />
                 </div>
 
-                {/* 3. Experience */}
+                {/* 3. Featured Project */}
                 <div
                   className="w-full animate-fade-in"
                   style={{ animationDelay: "500ms", opacity: 0 }}
                 >
+                  <FeaturedProject />
+                </div>
+
+                {/* 4. Languages */}
+                <div
+                  className="w-full animate-fade-in"
+                  style={{ animationDelay: "600ms", opacity: 0 }}
+                >
+                  <LanguagesCard />
+                </div>
+              </div>
+
+              {/* Columna 3 - Información Profesional */}
+              <div className="flex flex-col gap-2 h-full">
+                {/* 1. Tech Stack */}
+                <div
+                  className="w-full animate-fade-in"
+                  style={{ animationDelay: "700ms", opacity: 0 }}
+                >
+                  <TechnologiesCard />
+                </div>
+
+                {/* 2. Experience */}
+                <div
+                  className="w-full animate-fade-in"
+                  style={{ animationDelay: "800ms", opacity: 0 }}
+                >
                   <ExperienceCard />
+                </div>
+
+                {/* 3. Certifications */}
+                <div
+                  className="w-full animate-fade-in"
+                  style={{ animationDelay: "900ms", opacity: 0 }}
+                >
+                  <CertificationsCard />
                 </div>
               </div>
             </div>
@@ -148,11 +186,12 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-border py-3 mt-auto">
+        <footer className="border-t border-border py-2 mt-auto">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-6">
             <p className="text-center text-xs text-muted-foreground">
               © {new Date().getFullYear()} · {t.footer.madeWith}{" "}
-              <span className="text-primary">♥</span> {t.footer.by} {t.footer.name}
+              <span className="text-primary">♥</span> {t.footer.by}{" "}
+              {t.footer.name}
             </p>
           </div>
         </footer>

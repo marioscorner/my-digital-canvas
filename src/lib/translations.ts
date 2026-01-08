@@ -8,7 +8,7 @@ export const translations = {
       greeting: "Hola, soy",
       name: 'Mario "marioscorner" Gutiérrez',
       intro: "desarrollador full stack.",
-      cta: "Aquí encontrarás mis redes, mi GitHub y un enlace para descargar mi CV.",
+      cta: "Aquí encontrarás mis redes y un enlace para descargar mi CV.",
       downloadCV: "Descargar CV",
     },
     // About Card
@@ -16,11 +16,11 @@ export const translations = {
       label: "About",
       title: "About me",
       paragraph1:
-        "Soy Mario Gutiérrez González, desarrollador de software en España. Vengo del mundo audiovisual, pero la programación fue ganando terreno hasta convertirse en mi camino profesional.",
+        "Vengo del mundo audiovisual, pero la programación fue ganando terreno hasta convertirse en mi camino profesional.",
+      paragraphFullStack:
+        "Como desarrollador full stack, trabajo tanto en la totalidad del proceso de desarrollo de software, creando aplicaciones web completas. Esto me permite tener una visión integral de los proyectos y entender cómo cada pieza se conecta para crear soluciones eficientes y escalables. No me especializo en un solo lenguaje o framework, sino que me gusta trabajar con las mejores herramientas para cada proyecto.",
       paragraph2:
         "Más allá del código, me encanta leer, la música, viajar y todo lo que tenga un punto friki.",
-      paragraph3:
-        "También soy muy deportista. Practico Taekwondo desde siempre, tengo mi propio gimnasio y estoy a punto de convertirme en Maestro Nacional.",
     },
     // Technologies Card
     technologies: {
@@ -39,7 +39,8 @@ export const translations = {
     techStack: {
       status: "Status",
       available: "Buscando trabajo",
-      statusDetail: "Actualmente estoy buscando una oportunidad para seguir creciendo como desarrollador.",
+      statusDetail:
+        "Actualmente estoy buscando una oportunidad para seguir creciendo como desarrollador.",
       experience: "Experiencia",
     },
     // Featured Project
@@ -48,17 +49,12 @@ export const translations = {
       comingSoon: "Próximamente",
       visitWeb: "Visitar web",
       description:
-        "Este proyecto nace como mi TFM y como respuesta a una necesidad real: mejorar la comunicación entre alumnos y profesores mediante un chat y centralizar toda la gestión y documentación de un gimnasio de Taekwondo.",
+        "Este proyecto nace como mi TFM y como respuesta a una necesidad real: mejorar la comunicación entre alumnos y profesores mediante un chat y centralizar toda la gestión gimnasio de Taekwondo.",
+      description2:
+        "He implementado un chat en tiempo real entre alumnos y profesor, así como un perfil de alumno en el que puede ver sus datos y seguir su progreso.",
       cta: "Te invito a descubrirlo.",
     },
-    // Spotify Card
-    spotify: {
-      label: "Music",
-      title: "¿Quién es marioscorner?",
-      description:
-        "Creo que la música dice mucho de quiénes somos. Estas son las 10 canciones que mejor me definen.",
-      openPlaylist: "Abrir en Spotify",
-    },
+
     // Footer
     footer: {
       madeWith: "Hecho con",
@@ -75,6 +71,23 @@ export const translations = {
     cv: {
       url: "/cv-es.pdf",
     },
+    // Certifications
+    certifications: {
+      title: "Certificaciones",
+      empty: "Próximamente",
+    },
+    // Languages
+    languages: {
+      title: "Idiomas",
+      empty: "Próximamente",
+    },
+    // Projects
+    projects: {
+      title: "Proyectos",
+      description:
+        "En mi GitHub encontrarás proyectos personales y ejemplos de mi trabajo con diferentes tecnologías y frameworks. Siempre estoy con algún proyecto entre manos, así que no dudes en echarle un vistazo de vez en cuándo.",
+      visitGitHub: "Ver en GitHub",
+    },
   },
   en: {
     // Hero Section
@@ -83,7 +96,7 @@ export const translations = {
       greeting: "Hi, I'm",
       name: 'Mario "marioscorner" Gutiérrez',
       intro: "full stack developer.",
-      cta: "Here you'll find my social networks, GitHub and my CV.",
+      cta: "Here you'll find my social networks and my CV.",
       downloadCV: "Download CV",
     },
     // About Card
@@ -91,11 +104,11 @@ export const translations = {
       label: "About",
       title: "About me",
       paragraph1:
-        "I'm Mario Gutiérrez González, a software developer in Spain. I come from the audiovisual world, but programming gradually gained ground until it became my professional path.",
+        "I come from the audiovisual world, but programming gradually gained ground until it became my professional path.",
+      paragraphFullStack:
+        "As a full stack developer, I work across the entire software development process, creating complete web applications. This allows me to have a comprehensive view of projects and understand how each piece connects to create efficient and scalable solutions. I don't specialize in a single language or framework, but rather I like to work with the best tools for each project.",
       paragraph2:
         "Beyond code, I love reading, music, traveling and everything that has a geeky touch.",
-      paragraph3:
-        "I'm also very athletic. I've been practicing Taekwondo forever, I have my own gym and I'm about to become a National Master.",
     },
     // Technologies Card
     technologies: {
@@ -114,7 +127,8 @@ export const translations = {
     techStack: {
       status: "Status",
       available: "Looking for work",
-      statusDetail: "I'm currently looking for an opportunity to keep growing as a developer.",
+      statusDetail:
+        "I'm currently looking for an opportunity to keep growing as a developer.",
       experience: "Experience",
     },
     // Featured Project
@@ -123,16 +137,10 @@ export const translations = {
       comingSoon: "Coming soon",
       visitWeb: "Visit website",
       description:
-        "This project was born as my Master's Thesis and as a response to a real need: improve communication between students and teachers through a chat and centralize all the management and documentation of a Taekwondo gym.",
+        "This project was born as my Master's Thesis and as a response to a real need: improve communication between students and teachers through a chat and centralize all the management of a Taekwondo gym.",
+      description2:
+        "I have implemented a real-time chat between students and teacher, as well as a student profile where they can see their data and update it.",
       cta: "I invite you to discover it.",
-    },
-    // Spotify Card
-    spotify: {
-      label: "Music",
-      title: "Who is marioscorner?",
-      description:
-        "I believe music says a lot about who we are. These are the 10 songs that best define me.",
-      openPlaylist: "Open on Spotify",
     },
     // Footer
     footer: {
@@ -148,6 +156,23 @@ export const translations = {
     // CV
     cv: {
       url: "/cv-en.pdf",
+    },
+    // Certifications
+    certifications: {
+      title: "Certifications",
+      empty: "Coming soon",
+    },
+    // Languages
+    languages: {
+      title: "Languages",
+      empty: "Coming soon",
+    },
+    // Projects
+    projects: {
+      title: "Projects",
+      description:
+        "On my GitHub you'll find personal projects and examples of my work with different technologies and frameworks. I'm always working on some project, so feel free to check it out from time to time.",
+      visitGitHub: "View on GitHub",
     },
   },
 } as const;

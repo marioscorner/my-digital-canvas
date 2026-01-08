@@ -14,15 +14,15 @@ const ContactCard = () => {
       id="contact"
     >
       <div>
-        <div className="mb-2 flex items-center gap-2">
+        <div className="mb-1 flex items-center gap-2">
           <MessageSquare className="h-4 w-4 text-primary" />
           <span className="section-label">{t.contact.label}</span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div>
             <span className="section-label">{t.contact.contactDetails}</span>
-            <div className="mt-2 flex items-center gap-2 text-sm text-foreground transition-colors hover:text-primary cursor-default">
+            <div className="mt-1 flex items-center gap-2 text-sm text-foreground transition-colors hover:text-primary cursor-default">
               <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
               {email}
             </div>
@@ -34,10 +34,7 @@ const ContactCard = () => {
         </div>
       </div>
 
-      <a
-        href={`mailto:${email}`}
-        className="btn-accent w-full justify-center mt-4 text-sm"
-      >
+      <a href={`mailto:${email}`} className="btn-accent mt-2">
         <Mail className="h-4 w-4 shrink-0" />
         <span className="whitespace-nowrap">{t.contact.sendEmail}</span>
       </a>

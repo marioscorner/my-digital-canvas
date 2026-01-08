@@ -6,14 +6,18 @@ const AboutCard = () => {
 
   return (
     <div className="bento-card flex flex-col">
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-1 flex items-center gap-2">
         <User className="h-4 w-4 text-primary" />
         <span className="section-label">{t.about.label}</span>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <p className="text-sm text-muted-foreground leading-relaxed">
           {t.about.paragraph1}
+        </p>
+
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {t.about.paragraphFullStack}
         </p>
 
         <p className="text-sm text-muted-foreground leading-relaxed">

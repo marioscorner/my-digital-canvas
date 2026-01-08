@@ -1,5 +1,5 @@
 import { FileText, Hand } from "lucide-react";
-import { FaGithub, FaLinkedin, FaInstagram, FaXTwitter, FaSpotify } from "react-icons/fa6";
+import { FaLinkedin } from "react-icons/fa6";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const HeroSection = () => {
@@ -10,32 +10,25 @@ const HeroSection = () => {
 
   // Editable links
   const socialLinks = [
-    { name: "GitHub", url: "https://github.com/marioscorner", icon: FaGithub },
     {
       name: "LinkedIn",
       url: "https://linkedin.com/in/marioscorner",
       icon: FaLinkedin,
     },
-    {
-      name: "Instagram",
-      url: "https://instagram.com/marioscorner",
-      icon: FaInstagram,
-    },
-    { name: "Twitter", url: "https://x.com/elrincondehoid", icon: FaXTwitter },
-    { name: "Spotify", url: "https://open.spotify.com/playlist/3PgjqksPrmqU4KxsISTjoV?si=312ac94e52624836", icon: FaSpotify },
   ];
 
   return (
-    <div className="bento-card flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div className="flex-1 space-y-3">
+    <div className="bento-card flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+      <div className="flex-1 space-y-2">
         <div className="flex items-center gap-2">
           <Hand className="h-4 w-4 text-primary" />
           <span className="section-label">{t.hero.welcome}</span>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <p className="text-lg leading-relaxed text-foreground">
-            {t.hero.greeting} <span className="font-semibold">{t.hero.name}</span>, {t.hero.intro}
+            {t.hero.greeting}{" "}
+            <span className="font-semibold">{t.hero.name}</span>, {t.hero.intro}
           </p>
 
           <p className="text-sm text-muted-foreground">{t.hero.cta}</p>
@@ -51,18 +44,19 @@ const HeroSection = () => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="social-icon-btn"
+                className="btn-primary"
                 aria-label={link.name}
                 title={link.name}
               >
-                <IconComponent className="h-4 w-4" />
+                <IconComponent className="h-4 w-4 shrink-0" />
+                <span className="whitespace-nowrap">{link.name}</span>
               </a>
             );
           })}
 
-          <a href={t.cv.url} download className="btn-primary ml-1">
-            <FileText className="h-3.5 w-3.5 shrink-0" />
-            <span className="whitespace-nowrap text-sm">{t.hero.downloadCV}</span>
+          <a href={t.cv.url} download className="btn-primary">
+            <FileText className="h-4 w-4 shrink-0" />
+            <span className="whitespace-nowrap">{t.hero.downloadCV}</span>
           </a>
         </div>
       </div>

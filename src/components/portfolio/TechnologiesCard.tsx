@@ -24,16 +24,12 @@ const TechnologiesCard = () => {
 
   return (
     <div className="bento-card flex flex-col">
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-1 flex items-center gap-2">
         <Code2 className="h-4 w-4 text-primary" />
         <span className="section-label">{t.technologies.label}</span>
       </div>
 
-      <div className="space-y-2">
-        <p className="text-sm text-muted-foreground mb-2">
-          {t.technologies.description}
-        </p>
-
+      <div className="space-y-1">
         <div className="grid grid-cols-2 gap-1.5">
           {techStack.map((tech) => (
             <span
@@ -50,4 +46,3 @@ const TechnologiesCard = () => {
 };
 
 export default TechnologiesCard;
-
