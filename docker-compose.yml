@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-digital-canvas
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Descomenta las siguientes líneas si usas Traefik como reverse proxy
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.my-digital-canvas.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
+    #   - "traefik.http.routers.my-digital-canvas.entrypoints=websecure"
+    #   - "traefik.http.routers.my-digital-canvas.tls.certresolver=letsencrypt"
+    #   - "traefik.http.services.my-digital-canvas.loadbalancer.server.port=80"

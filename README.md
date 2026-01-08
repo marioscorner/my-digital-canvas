@@ -12,7 +12,6 @@ Este proyecto está construido con:
 - **Tailwind CSS** - Framework CSS utility-first
 - **shadcn/ui** - Componentes UI
 - **React Router** - Enrutamiento
-- **React Query** - Gestión de estado y datos
 
 ## 📦 Instalación
 
@@ -38,6 +37,42 @@ npm run dev
 - `npm run build` - Construye la aplicación para producción
 - `npm run preview` - Previsualiza la build de producción
 - `npm run lint` - Ejecuta el linter
+
+## 🐳 Despliegue con Docker
+
+El proyecto está dockerizado y listo para desplegarse en un VPS.
+
+### Desarrollo local con Docker
+
+```sh
+# Construir la imagen
+docker build -t my-digital-canvas .
+
+# Ejecutar el contenedor
+docker run -p 80:80 my-digital-canvas
+```
+
+### Despliegue en producción
+
+#### Opción 1: Despliegue Automático con GitHub Actions (Recomendado) 🚀
+
+El proyecto está configurado para desplegarse automáticamente cada vez que hagas `git push` a la rama `main`.
+
+**Configuración inicial:**
+1. Sube tu código a GitHub
+2. Configura los secrets en GitHub: `SSH_PRIVATE_KEY`, `SSH_USER`, `SSH_HOST`
+3. ¡Listo! Cada push desplegará automáticamente
+
+Ver la [guía completa de despliegue con GitHub](./DEPLOY_GITHUB.md).
+
+#### Opción 2: Despliegue Manual
+
+```sh
+# Con Docker Compose
+docker-compose up -d --build
+```
+
+Para más detalles sobre el despliegue, consulta [DEPLOY.md](./DEPLOY.md) o [DEPLOY_GITHUB.md](./DEPLOY_GITHUB.md).
 
 ## 📁 Estructura del proyecto
 

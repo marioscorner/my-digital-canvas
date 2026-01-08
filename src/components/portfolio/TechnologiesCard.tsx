@@ -4,43 +4,45 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const TechnologiesCard = () => {
   const { t } = useLanguage();
 
-  // Editable content - Technologies
+  // Editable content - Technologies (4 per row)
   const techStack = [
     "JavaScript",
-    "React",
     "TypeScript",
     "Node.js",
-    "Tailwind CSS",
-    "Next.js",
+    "Express",
+    "React",
+    "Angular",
+    "Python",
+    "Django",
+    "FastAPI",
+    "PostgreSQL",
+    "MySQL",
+    "Docker",
+    "Linux",
+    "Git",
   ];
 
   return (
-    <div className="bento-card h-full flex flex-col">
-      <div className="mb-4 flex items-center gap-2">
-        <Code2 className="h-5 w-5 text-primary" />
+    <div className="bento-card flex flex-col">
+      <div className="mb-2 flex items-center gap-2">
+        <Code2 className="h-4 w-4 text-primary" />
         <span className="section-label">{t.technologies.label}</span>
       </div>
 
-      <h2 className="mb-4 text-lg font-semibold text-foreground">
-        {t.technologies.title}
-      </h2>
-
-      <div className="space-y-4 flex-1">
-        <p className="text-sm text-muted-foreground">
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground mb-2">
           {t.technologies.description}
         </p>
 
-        <div>
-          <p className="mb-2 text-sm text-muted-foreground">
-            {t.technologies.mainTools}
-          </p>
-          <ul className="space-y-1.5">
-            {techStack.map((tech) => (
-              <li key={tech} className="tech-tag">
-                {tech}
-              </li>
-            ))}
-          </ul>
+        <div className="grid grid-cols-2 gap-1.5">
+          {techStack.map((tech) => (
+            <span
+              key={tech}
+              className="inline-flex items-center justify-center rounded-md bg-primary/10 px-2.5 py-1 text-sm font-medium text-primary border border-primary/20"
+            >
+              {tech}
+            </span>
+          ))}
         </div>
       </div>
     </div>

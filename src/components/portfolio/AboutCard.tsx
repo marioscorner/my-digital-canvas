@@ -1,24 +1,28 @@
+import { User } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const AboutCard = () => {
   const { t } = useLanguage();
 
-  // Editable content
-  const name = "Mario Gutiérrez González";
-  const location = "España";
-
   return (
-    <div className="bento-card h-full flex flex-col">
-      <h2 className="mb-4 text-lg font-semibold text-foreground">
-        {t.about.title}
-      </h2>
+    <div className="bento-card flex flex-col">
+      <div className="mb-2 flex items-center gap-2">
+        <User className="h-4 w-4 text-primary" />
+        <span className="section-label">{t.about.label}</span>
+      </div>
 
-      <div className="space-y-4 flex-1">
-        <p className="text-sm text-muted-foreground">
-          {t.about.greeting} {name}, {t.about.description} {location}.
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {t.about.paragraph1}
         </p>
 
-        <p className="text-sm text-muted-foreground">{t.about.hobbies}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {t.about.paragraph2}
+        </p>
+
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {t.about.paragraph3}
+        </p>
       </div>
     </div>
   );

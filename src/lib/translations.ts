@@ -6,38 +6,40 @@ export const translations = {
     hero: {
       welcome: "welcome",
       greeting: "Hola, soy",
-      intro:
-        "un desarrollador de software con enfoque en la experiencia de usuario, animaciones e interacciones.",
-      cta: "No dudes en contactarme si tienes algún proyecto en mente, o simplemente para saludar.",
+      name: 'Mario "marioscorner" Gutiérrez',
+      intro: "desarrollador full stack.",
+      cta: "Aquí encontrarás mis redes, mi GitHub y un enlace para descargar mi CV.",
       downloadCV: "Descargar CV",
     },
     // About Card
     about: {
+      label: "About",
       title: "About me",
-      greeting: "Hola, soy",
-      description: "un desarrollador de software de",
-      hobbies:
-        "Además de programar, me apasiona el diseño, las artes marciales y la fotografía. Creo firmemente en la disciplina como motor del éxito.",
+      paragraph1:
+        "Soy Mario Gutiérrez González, desarrollador de software en España. Vengo del mundo audiovisual, pero la programación fue ganando terreno hasta convertirse en mi camino profesional.",
+      paragraph2:
+        "Más allá del código, me encanta leer, la música, viajar y todo lo que tenga un punto friki.",
+      paragraph3:
+        "También soy muy deportista. Practico Taekwondo desde siempre, tengo mi propio gimnasio y estoy a punto de convertirme en Maestro Nacional.",
     },
     // Technologies Card
     technologies: {
       label: "Tech Stack",
       title: "Tecnologías",
-      description:
-        "Herramientas y tecnologías con las que trabajo habitualmente.",
-      mainTools: "Mis herramientas principales:",
+      description: "Trabajo habitualmente con:",
     },
     // Contact Card
     contact: {
-      title: "Let's start working together!",
+      label: "Contact",
+      title: "¡Vamos a trabajar juntos!",
       contactDetails: "Contact Details",
       sendEmail: "Enviar email",
     },
     // Tech Stack Card (Status/Experience)
     techStack: {
       status: "Status",
-      available: "Disponible para proyectos",
-      statusDetail: "Actualmente trabajando en proyectos freelance",
+      available: "Buscando trabajo",
+      statusDetail: "Actualmente estoy buscando una oportunidad para seguir creciendo como desarrollador.",
       experience: "Experiencia",
     },
     // Featured Project
@@ -45,12 +47,16 @@ export const translations = {
       label: "Proyecto destacado",
       comingSoon: "Próximamente",
       visitWeb: "Visitar web",
+      description:
+        "Este proyecto nace como mi TFM y como respuesta a una necesidad real: mejorar la comunicación entre alumnos y profesores mediante un chat y centralizar toda la gestión y documentación de un gimnasio de Taekwondo.",
+      cta: "Te invito a descubrirlo.",
     },
     // Spotify Card
     spotify: {
       label: "Music",
+      title: "¿Quién es marioscorner?",
       description:
-        "Una selección de canciones que me inspiran y acompañan mientras programo.",
+        "Creo que la música dice mucho de quiénes somos. Estas son las 10 canciones que mejor me definen.",
       openPlaylist: "Abrir en Spotify",
     },
     // Footer
@@ -75,37 +81,40 @@ export const translations = {
     hero: {
       welcome: "welcome",
       greeting: "Hi, I'm",
-      intro:
-        "a software developer focused on user experience, animations and interactions.",
-      cta: "Feel free to contact me if you have a project in mind, or just to say hello.",
+      name: 'Mario "marioscorner" Gutiérrez',
+      intro: "full stack developer.",
+      cta: "Here you'll find my social networks, GitHub and my CV.",
       downloadCV: "Download CV",
     },
     // About Card
     about: {
+      label: "About",
       title: "About me",
-      greeting: "Hi, I'm",
-      description: "a software developer from",
-      hobbies:
-        "Besides programming, I'm passionate about design, martial arts and photography. I firmly believe in discipline as the engine of success.",
+      paragraph1:
+        "I'm Mario Gutiérrez González, a software developer in Spain. I come from the audiovisual world, but programming gradually gained ground until it became my professional path.",
+      paragraph2:
+        "Beyond code, I love reading, music, traveling and everything that has a geeky touch.",
+      paragraph3:
+        "I'm also very athletic. I've been practicing Taekwondo forever, I have my own gym and I'm about to become a National Master.",
     },
     // Technologies Card
     technologies: {
       label: "Tech Stack",
       title: "Technologies",
-      description: "Tools and technologies I work with regularly.",
-      mainTools: "My main tools:",
+      description: "I usually work with:",
     },
     // Contact Card
     contact: {
-      title: "Let's start working together!",
+      label: "Contact",
+      title: "Let's work together!",
       contactDetails: "Contact Details",
       sendEmail: "Send email",
     },
     // Tech Stack Card (Status/Experience)
     techStack: {
       status: "Status",
-      available: "Available for projects",
-      statusDetail: "Currently working on freelance projects",
+      available: "Looking for work",
+      statusDetail: "I'm currently looking for an opportunity to keep growing as a developer.",
       experience: "Experience",
     },
     // Featured Project
@@ -113,12 +122,16 @@ export const translations = {
       label: "Featured project",
       comingSoon: "Coming soon",
       visitWeb: "Visit website",
+      description:
+        "This project was born as my Master's Thesis and as a response to a real need: improve communication between students and teachers through a chat and centralize all the management and documentation of a Taekwondo gym.",
+      cta: "I invite you to discover it.",
     },
     // Spotify Card
     spotify: {
       label: "Music",
+      title: "Who is marioscorner?",
       description:
-        "A selection of songs that inspire me and accompany me while coding.",
+        "I believe music says a lot about who we are. These are the 10 songs that best define me.",
       openPlaylist: "Open on Spotify",
     },
     // Footer
