@@ -21,8 +21,7 @@ const ContactCard = () => {
 
         <div className="space-y-2">
           <div>
-            <span className="section-label">{t.contact.contactDetails}</span>
-            <div className="mt-1 flex items-center gap-2 text-sm text-foreground transition-colors hover:text-primary cursor-default">
+            <div className="flex items-center gap-2 text-sm text-foreground transition-colors hover:text-primary cursor-default">
               <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
               {email}
             </div>

@@ -19,7 +19,7 @@ const FeaturedProject = () => {
           <span className="section-label">{t.featured.label}</span>
         </div>
 
-        <h3 className="mb-1 text-base font-semibold text-foreground">
+        <h3 className="mb-1 text-base font-semibold text-primary">
           {projectTitle}
         </h3>
 
