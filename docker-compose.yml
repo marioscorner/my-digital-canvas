@@ -14,12 +14,15 @@ services:
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.letsencrypt.acme.email=hello@marioscorner.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=DEBUG"
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
+    networks:
+      - web
 
   web:
     build:
@@ -27,15 +30,39 @@ services:
       dockerfile: Dockerfile
     container_name: my-digital-canvas
     restart: unless-stopped
+    expose:
+      - "80"
     healthcheck:
-      test: ["CMD","wget","--quiet","--tries=1","--spider","http://localhost/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=web"
       - "traefik.http.routers.my-digital-canvas.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
       - "traefik.http.routers.my-digital-canvas.entrypoints=websecure"
+      - "traefik.http.routers.my-digital-canvas.tls=true"
       - "traefik.http.routers.my-digital-canvas.tls.certresolver=letsencrypt"
       - "traefik.http.services.my-digital-canvas.loadbalancer.server.port=80"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.my-digital-canvas-http.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
+      - "traefik.http.routers.my-digital-canvas-http.entrypoints=web"
+      - "traefik.http.routers.my-digital-canvas-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
