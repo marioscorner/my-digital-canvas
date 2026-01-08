@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   traefik:
-    image: traefik:v3.2.0
+    image: traefik:v2.11
     container_name: traefik
     restart: unless-stopped
     command:
@@ -52,7 +52,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
       
-      # Router HTTP (sin SSL, para pruebas y para challenge de Let's Encrypt)
+      # Router HTTP (sin SSL)
       - "traefik.http.routers.web-http.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
       - "traefik.http.routers.web-http.entrypoints=web"
       - "traefik.http.routers.web-http.service=web-service"
@@ -64,7 +64,7 @@ services:
       - "traefik.http.routers.web-https.tls.certresolver=letsencrypt"
       - "traefik.http.routers.web-https.service=web-service"
       
-      # Servicio (apunta al puerto 80 del contenedor)
+      # Servicio
       - "traefik.http.services.web-service.loadbalancer.server.port=80"
     networks:
       - web
