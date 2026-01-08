@@ -1,41 +1,41 @@
 version: "3.8"
 
 services:
-traefik:
-image: traefik:v3.1
-container_name: traefik
-restart: unless-stopped
-command:
-- "--providers.docker=true"
-- "--providers.docker.exposedbydefault=false"
-- "--entrypoints.web.address=:80"
-- "--entrypoints.websecure.address=:443"
-- "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-- "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-- "--certificatesresolvers.letsencrypt.acme.email=hello@marioscorner.com"
-- "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-ports:
-- "80:80"
-- "443:443"
-volumes:
-- "/var/run/docker.sock:/var/run/docker.sock:ro"
-- "./letsencrypt:/letsencrypt"
+ traefik:
+ image: traefik:v3.1
+ container_name: traefik
+ restart: unless-stopped
+ command:
+ - "--providers.docker=true"
+ - "--providers.docker.exposedbydefault=false"
+ - "--entrypoints.web.address=:80"
+ - "--entrypoints.websecure.address=:443"
+ - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+ - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+ - "--certificatesresolvers.letsencrypt.acme.email=hello@marioscorner.com"
+ - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+ ports:
+ - "80:80"
+ - "443:443"
+ volumes:
+ - "/var/run/docker.sock:/var/run/docker.sock:ro"
+ - "./letsencrypt:/letsencrypt"
 
-web:
-build:
-context: .
-dockerfile: Dockerfile
-container_name: my-digital-canvas
-restart: unless-stopped
-healthcheck:
-test: ["CMD","wget","--quiet","--tries=1","--spider","http://localhost/health"]
-interval: 30s
-timeout: 10s
-retries: 3
-start_period: 40s
-labels:
-- "traefik.enable=true"
-- "traefik.http.routers.my-digital-canvas.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
-- "traefik.http.routers.my-digital-canvas.entrypoints=websecure"
-- "traefik.http.routers.my-digital-canvas.tls.certresolver=letsencrypt"
-- "traefik.http.services.my-digital-canvas.loadbalancer.server.port=80"
+ web:
+ build:
+ context: .
+ dockerfile: Dockerfile
+ container_name: my-digital-canvas
+ restart: unless-stopped
+ healthcheck:
+ test: ["CMD","wget","--quiet","--tries=1","--spider","http://localhost/health"]
+ interval: 30s
+ timeout: 10s
+ retries: 3
+ start_period: 40s
+ labels:
+ - "traefik.enable=true"
+ - "traefik.http.routers.my-digital-canvas.rule=Host(`marioscorner.com`) || Host(`www.marioscorner.com`)"
+ - "traefik.http.routers.my-digital-canvas.entrypoints=websecure"
+ - "traefik.http.routers.my-digital-canvas.tls.certresolver=letsencrypt"
+ - "traefik.http.services.my-digital-canvas.loadbalancer.server.port=80"
