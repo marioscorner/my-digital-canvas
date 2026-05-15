@@ -1,5 +1,5 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+import { Pool } from 'pg';
+import 'dotenv/config';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -63,7 +63,7 @@ const logAudit = async (action, section, changes) => {
   );
 };
 
-module.exports = {
+export {
   pool,
   getContent,
   setContent,

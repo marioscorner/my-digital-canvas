@@ -1,12 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const session = require('express-session');
-const path = require('path');
-const { initDb } = require('./db/init');
-const authRoutes = require('./routes/auth');
-const contentRoutes = require('./routes/content');
-const uploadRoutes = require('./routes/uploads');
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import session from 'express-session';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { initDb } from './db/init.js';
+import authRoutes from './routes/auth.js';
+import contentRoutes from './routes/content.js';
+import uploadRoutes from './routes/uploads.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -91,4 +96,4 @@ const startServer = async () => {
 
 startServer();
 
-module.exports = app;
+export default app;

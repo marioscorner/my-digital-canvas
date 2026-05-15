@@ -226,4 +226,4 @@ const defaultContent = {
   },
 };
 
-module.exports = defaultContent;
+export default defaultContent;

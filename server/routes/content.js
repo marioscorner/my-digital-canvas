@@ -1,7 +1,7 @@
-const express = require('express');
-const { getContent, setContent, getAllContent, logAudit } = require('../db/queries');
-const { requireAuth } = require('../middleware/auth');
-const defaultContent = require('./defaultContent');
+import express from 'express';
+import { getContent, setContent, getAllContent, logAudit } from '../db/queries.js';
+import { requireAuth } from '../middleware/auth.js';
+import defaultContent from './defaultContent.js';
 
 const router = express.Router();
 
@@ -75,4 +75,4 @@ router.post('/seed', requireAuth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

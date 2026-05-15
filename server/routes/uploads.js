@@ -1,9 +1,9 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs').promises;
-const { getUploads, addUpload, deleteUpload, logAudit } = require('../db/queries');
-const { requireAuth } = require('../middleware/auth');
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { promises as fs } from 'fs';
+import { getUploads, addUpload, deleteUpload, logAudit } from '../db/queries.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -176,4 +176,4 @@ router.delete('/:filename', requireAuth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

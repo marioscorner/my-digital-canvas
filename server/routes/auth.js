@@ -1,5 +1,5 @@
-const express = require('express');
-const { verifyPassword, requireAuth } = require('../middleware/auth');
+import express from 'express';
+import { verifyPassword, requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -67,4 +67,4 @@ router.get('/status', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

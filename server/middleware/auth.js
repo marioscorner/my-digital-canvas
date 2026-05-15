@@ -1,4 +1,4 @@
-const argon2 = require('argon2');
+import argon2 from 'argon2';
 
 const verifyPassword = async (plainPassword, hash) => {
   try {
@@ -22,7 +22,7 @@ const optionalAuth = (req, res, next) => {
   next();
 };
 
-module.exports = {
+export {
   verifyPassword,
   requireAuth,
   optionalAuth,
