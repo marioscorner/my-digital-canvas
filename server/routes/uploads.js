@@ -20,16 +20,16 @@ const ensureUploadDir = async () => {
 
 ensureUploadDir();
 
-// Configure multer
+// Configure multer - temporary storage before renaming
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
+    // Use a temporary name; we'll rename it properly after validation
     const timestamp = Date.now();
-    const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname, ext);
-    cb(null, `${name}-${timestamp}${ext}`);
+    const randomStr = Math.random().toString(36).substring(7);
+    cb(null, `temp-${timestamp}-${randomStr}`);
   },
 });
 
@@ -48,6 +48,19 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB
   },
 });
+
+/**
+ * Generate standardized filename based on document type and language
+ * Examples: cv-es.pdf, cv-en.pdf, document-es.pdf, etc.
+ */
+const generateStandardFilename = (documentType, language, mimeType) => {
+  const ext = mimeType === 'application/pdf' ? '.pdf' : 
+              mimeType === 'image/jpeg' ? '.jpg' :
+              mimeType === 'image/png' ? '.png' :
+              mimeType === 'image/webp' ? '.webp' : '.pdf';
+  
+  return `${documentType}-${language}${ext}`;
+};
 
 // GET /api/uploads
 // Public route - get all uploads
@@ -72,10 +85,33 @@ router.post('/', requireAuth, upload.single('file'), async (req, res) => {
 
     const { language = 'en', documentType = 'cv' } = req.body;
 
-    const url = `/uploads/${req.file.filename}`;
+    // Generate standardized filename
+    const standardFilename = generateStandardFilename(documentType, language, req.file.mimetype);
+    const standardPath = path.join(UPLOAD_DIR, standardFilename);
+    const tempPath = path.join(UPLOAD_DIR, req.file.filename);
 
+    // Delete any existing file with the same standardized name
+    try {
+      await fs.unlink(standardPath);
+      // Also delete from database
+      await deleteUpload(standardFilename);
+    } catch (error) {
+      // File doesn't exist yet, which is fine
+    }
+
+    // Rename temp file to standard name
+    try {
+      await fs.rename(tempPath, standardPath);
+    } catch (error) {
+      console.error('Error renaming file:', error);
+      throw new Error('Failed to process uploaded file');
+    }
+
+    const url = `/uploads/${standardFilename}`;
+
+    // Add to database with standard filename
     const uploadRecord = await addUpload(
-      req.file.filename,
+      standardFilename,
       req.file.originalname,
       req.file.mimetype,
       req.file.size,
@@ -86,7 +122,8 @@ router.post('/', requireAuth, upload.single('file'), async (req, res) => {
 
     // Log the upload
     await logAudit('UPLOAD', 'uploads', {
-      filename: req.file.filename,
+      filename: standardFilename,
+      originalName: req.file.originalname,
       language,
       documentType,
     });
@@ -94,6 +131,16 @@ router.post('/', requireAuth, upload.single('file'), async (req, res) => {
     res.json(uploadRecord);
   } catch (error) {
     console.error('Error uploading file:', error);
+    
+    // Cleanup temp file if it exists
+    if (req.file) {
+      try {
+        await fs.unlink(path.join(UPLOAD_DIR, req.file.filename));
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup temp file:', cleanupError);
+      }
+    }
+    
     res.status(500).json({ error: error.message || 'Failed to upload file' });
   }
 });
