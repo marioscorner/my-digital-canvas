@@ -37,7 +37,7 @@ DATABASE_URL=postgres://portfolio:your_very_secure_password_here_min_32_chars@po
 
 # Admin Configuration
 ADMIN_USER=admin
-ADMIN_PASSWORD_HASH=<paste_the_hash_from_Step_1>
+ADMIN_PASSWORD_HASH='<paste_the_hash_from_Step_1>'  # Note: Single quotes prevent variable interpolation
 SESSION_SECRET=<generate_a_random_secret_32_chars_minimum>
 
 # File Upload Configuration
