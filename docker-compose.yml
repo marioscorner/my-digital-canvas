@@ -65,6 +65,7 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgres://portfolio:${DB_PASSWORD:-password}@postgres:5432/portfolio
       ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:-}
       SESSION_SECRET: ${SESSION_SECRET:-}
       UPLOAD_DIR: /app/uploads

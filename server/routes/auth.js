@@ -1,14 +1,26 @@
 import express from 'express';
+import argon2 from 'argon2';
 import { verifyPassword, requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+let adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
 
-if (!ADMIN_PASSWORD_HASH) {
+const getAdminPasswordHash = async () => {
+  if (adminPasswordHash) return adminPasswordHash;
+
+  if (process.env.ADMIN_PASSWORD) {
+    adminPasswordHash = await argon2.hash(process.env.ADMIN_PASSWORD);
+    return adminPasswordHash;
+  }
+
+  return null;
+};
+
+if (!adminPasswordHash && !process.env.ADMIN_PASSWORD) {
   console.warn(
-    '⚠️  Warning: ADMIN_PASSWORD_HASH is not set. Admin routes will not work. Run: npm run hash-password'
+    '⚠️  Warning: ADMIN_PASSWORD_HASH or ADMIN_PASSWORD is not set. Admin routes will not work. Run: pnpm hash-password or set ADMIN_PASSWORD.'
   );
 }
 
@@ -25,11 +37,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    if (!ADMIN_PASSWORD_HASH) {
+    const passwordHash = await getAdminPasswordHash();
+
+    if (!passwordHash) {
       return res.status(500).json({ error: 'Admin authentication not configured' });
     }
 
-    const isValid = await verifyPassword(password, ADMIN_PASSWORD_HASH);
+    const isValid = await verifyPassword(password, passwordHash);
 
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid credentials' });

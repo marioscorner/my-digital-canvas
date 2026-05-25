@@ -2,10 +2,12 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { initDb } from './db/init.js';
+import { pool } from './db/queries.js';
 import authRoutes from './routes/auth.js';
 import contentRoutes from './routes/content.js';
 import uploadRoutes from './routes/uploads.js';
@@ -15,6 +17,28 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const PgSession = connectPgSimple(session);
+
+const validateProductionEnv = () => {
+  if (process.env.NODE_ENV !== 'production') return;
+
+  const missing = ['SESSION_SECRET'].filter((key) => !process.env[key]);
+
+  if (!process.env.ADMIN_PASSWORD_HASH && !process.env.ADMIN_PASSWORD) {
+    missing.push('ADMIN_PASSWORD_HASH or ADMIN_PASSWORD');
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required production environment variables: ${missing.join(', ')}. ` +
+        'Set ADMIN_PASSWORD for automatic startup hashing, or generate ADMIN_PASSWORD_HASH with: pnpm hash-password'
+    );
+  }
+};
+
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // Middleware
 app.use(cors());
@@ -24,6 +48,11 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Session configuration
 app.use(
   session({
+    store: new PgSession({
+      pool,
+      tableName: 'session',
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
     resave: false,
     saveUninitialized: false,
@@ -78,6 +107,8 @@ app.use((err, req, res, next) => {
 // Initialize database and start server
 const startServer = async () => {
   try {
+    validateProductionEnv();
+
     // Initialize database tables
     await initDb();
     console.log('✅ Database initialized');
