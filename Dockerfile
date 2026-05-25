@@ -1,30 +1,34 @@
 # Stage 1: Build React app
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+RUN corepack enable && corepack prepare pnpm@11.1.1 --activate
+
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install dependencies
-RUN npm ci --legacy-peer-deps
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
 # Build the React app
-RUN npm run build
+RUN pnpm build
 
 # Stage 2: Production
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
+RUN corepack enable && corepack prepare pnpm@11.1.1 --activate
+
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install production dependencies only
-RUN npm ci --legacy-peer-deps --omit=dev
+RUN pnpm install --prod --frozen-lockfile
 
 # Copy built React app from builder
 COPY --from=builder /app/dist ./dist
@@ -44,4 +48,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Start the server
 CMD ["node", "server/index.js"]
-

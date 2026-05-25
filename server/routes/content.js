@@ -5,6 +5,20 @@ import defaultContent from './defaultContent.js';
 
 const router = express.Router();
 
+const isPlainObject = (value) =>
+  value && typeof value === 'object' && !Array.isArray(value);
+
+const mergeDefaults = (defaults, content) => {
+  if (!isPlainObject(defaults) || !isPlainObject(content)) {
+    return content ?? defaults;
+  }
+
+  return Object.entries({ ...defaults, ...content }).reduce((merged, [key, value]) => {
+    merged[key] = mergeDefaults(defaults[key], value);
+    return merged;
+  }, {});
+};
+
 // GET /api/content
 // Public route - get all content
 router.get('/', async (req, res) => {
@@ -12,7 +26,7 @@ router.get('/', async (req, res) => {
     const allContent = await getAllContent();
     
     // Merge with defaults to ensure all sections exist
-    const merged = { ...defaultContent, ...allContent };
+    const merged = mergeDefaults(defaultContent, allContent);
     
     res.json(merged);
   } catch (error) {
@@ -32,7 +46,7 @@ router.get('/:id', async (req, res) => {
       return res.json(defaultValue || null);
     }
     
-    res.json(content);
+    res.json(mergeDefaults(defaultContent[req.params.id], content));
   } catch (error) {
     console.error('Error fetching content:', error);
     res.status(500).json({ error: 'Failed to fetch content' });

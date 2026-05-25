@@ -51,6 +51,7 @@ const defaultContent = {
       statusDetail:
         "I'm currently looking for an opportunity to keep growing as a developer.",
     },
+    indicatorColor: "#22c55e",
   },
 
   contact: {

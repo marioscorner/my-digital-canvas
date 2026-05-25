@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { FileText, Hand } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa6";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -6,6 +7,36 @@ import { useContent } from "@/contexts/ContentContext";
 const HeroSection = () => {
   const { language } = useLanguage();
   const { content } = useContent();
+  const [uploadedCvUrl, setUploadedCvUrl] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchUploadedCv = async () => {
+      try {
+        const response = await fetch(`/api/uploads?language=${language}`);
+        if (!response.ok) throw new Error("Failed to fetch uploads");
+
+        const uploads = await response.json();
+        const cvUpload = Array.isArray(uploads)
+          ? uploads.find((upload) => upload.document_type === "cv")
+          : null;
+
+        if (!ignore) {
+          const cacheKey = cvUpload?.updated_at || cvUpload?.created_at || cvUpload?.uploaded_at || "";
+          setUploadedCvUrl(cvUpload?.url ? `${cvUpload.url}${cacheKey ? `?v=${encodeURIComponent(cacheKey)}` : ""}` : "");
+        }
+      } catch (error) {
+        if (!ignore) setUploadedCvUrl("");
+      }
+    };
+
+    fetchUploadedCv();
+
+    return () => {
+      ignore = true;
+    };
+  }, [language]);
 
   if (!content) {
     return <div className="bento-card">Loading...</div>;
@@ -14,8 +45,7 @@ const HeroSection = () => {
   const heroData = content.hero?.[language] || {};
   const socialLinks = content.social || [];
 
-  // Get CV URL from content or fallback
-  const cvUrl = language === "es" ? "/cv-es.pdf" : "/cv-en.pdf";
+  const cvUrl = uploadedCvUrl || (language === "es" ? "/cv-es.pdf" : "/cv-en.pdf");
 
   return (
     <div className="bento-card flex flex-col justify-between gap-2 sm:flex-row sm:items-end">

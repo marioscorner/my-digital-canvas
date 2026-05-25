@@ -1,7 +1,43 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, Save, AlertCircle, CheckCircle, Upload, Trash2 } from 'lucide-react';
+import { LogOut, Save, AlertCircle, CheckCircle, Upload, Trash2, Palette } from 'lucide-react';
+
+const tabs = ['hero', 'about', 'status', 'contact', 'featured', 'technologies', 'experience', 'certifications', 'languages', 'projects', 'uploads'];
+
+const sectionLabels = {
+  hero: 'Hero',
+  about: 'About',
+  status: 'Status',
+  contact: 'Contact',
+  featured: 'Featured Project',
+  technologies: 'Technologies',
+  experience: 'Experience',
+  certifications: 'Certifications',
+  languages: 'Languages',
+  projects: 'Projects',
+  uploads: 'Uploads',
+};
+
+const fieldLabels = {
+  es: 'Spanish',
+  en: 'English',
+  status: 'Section label',
+  available: 'Status text',
+  statusDetail: 'Status details',
+  indicatorColor: 'Indicator colour',
+  company: 'Company',
+  position: 'Position',
+  period: 'Period',
+  responsibilities: 'Responsibilities',
+  name: 'Name',
+  issuer: 'Issuer',
+  level: 'Level',
+};
+
+const getFieldLabel = (key) => fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (letter) => letter.toUpperCase());
+
+const isLongText = (key, value) => value.length > 100 || ['description', 'description2', 'paragraph1', 'paragraph2', 'paragraphFullStack', 'statusDetail', 'cta'].includes(key);
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +51,32 @@ const AdminDashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [selectedDocType, setSelectedDocType] = useState('cv');
+
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+  };
+
+  const fetchContent = useCallback(async () => {
+    try {
+      const response = await fetch('/api/content');
+      const data = await response.json();
+      setContent(data);
+    } catch (err) {
+      showMessage('error', 'Failed to load content');
+    }
+  }, []);
+
+  const fetchUploads = useCallback(async () => {
+    try {
+      const response = await fetch('/api/uploads');
+      const data = await response.json();
+      setUploads(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to load uploads:', err);
+      setUploads([]);
+    }
+  }, []);
 
   // Check authentication on mount
   useEffect(() => {
@@ -42,32 +104,6 @@ const AdminDashboard = () => {
 
     checkAuth();
   }, [navigate, fetchContent, fetchUploads]);
-
-  const fetchContent = useCallback(async () => {
-    try {
-      const response = await fetch('/api/content');
-      const data = await response.json();
-      setContent(data);
-    } catch (err) {
-      showMessage('error', 'Failed to load content');
-    }
-  }, []);
-
-  const fetchUploads = useCallback(async () => {
-    try {
-      const response = await fetch('/api/uploads');
-      const data = await response.json();
-      setUploads(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Failed to load uploads:', err);
-      setUploads([]);
-    }
-  }, []);
-
-  const showMessage = (type, text) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-  };
 
   const handleSave = async () => {
     if (!content) return;
@@ -118,6 +154,107 @@ const AdminDashboard = () => {
       updated[activeTab] = value;
     }
     setContent(updated);
+  };
+
+  const updateNestedContent = (groupKey, key, value) => {
+    if (!content) return;
+
+    setContent({
+      ...content,
+      [activeTab]: {
+        ...content[activeTab],
+        [groupKey]: {
+          ...content[activeTab][groupKey],
+          [key]: value,
+        },
+      },
+    });
+  };
+
+  const setActiveSection = (value) => {
+    if (!content) return;
+
+    setContent({
+      ...content,
+      [activeTab]: value,
+    });
+  };
+
+  const updateTechnologies = (items) => {
+    if (!content) return;
+
+    setContent({
+      ...content,
+      technologies: {
+        ...content.technologies,
+        items,
+      },
+    });
+  };
+
+  const updateArrayItem = (index, updater) => {
+    const currentSection = content?.[activeTab];
+    if (!Array.isArray(currentSection)) return;
+
+    setActiveSection(currentSection.map((item, itemIndex) => (
+      itemIndex === index ? updater(item) : item
+    )));
+  };
+
+  const addArrayItem = (item) => {
+    const currentSection = content?.[activeTab];
+    if (!Array.isArray(currentSection)) return;
+
+    setActiveSection([...currentSection, item]);
+  };
+
+  const removeArrayItem = (index) => {
+    const currentSection = content?.[activeTab];
+    if (!Array.isArray(currentSection)) return;
+
+    setActiveSection(currentSection.filter((_, itemIndex) => itemIndex !== index));
+  };
+
+  const updateLocalizedField = (index, field, language, value) => {
+    updateArrayItem(index, (item) => ({
+      ...item,
+      [field]: {
+        ...item[field],
+        [language]: value,
+      },
+    }));
+  };
+
+  const updateLocalizedListField = (index, field, language, listIndex, value) => {
+    updateArrayItem(index, (item) => ({
+      ...item,
+      [field]: {
+        ...item[field],
+        [language]: item[field][language].map((entry, entryIndex) => (
+          entryIndex === listIndex ? value : entry
+        )),
+      },
+    }));
+  };
+
+  const addLocalizedListField = (index, field, language) => {
+    updateArrayItem(index, (item) => ({
+      ...item,
+      [field]: {
+        ...item[field],
+        [language]: [...item[field][language], ''],
+      },
+    }));
+  };
+
+  const removeLocalizedListField = (index, field, language, listIndex) => {
+    updateArrayItem(index, (item) => ({
+      ...item,
+      [field]: {
+        ...item[field],
+        [language]: item[field][language].filter((_, entryIndex) => entryIndex !== listIndex),
+      },
+    }));
   };
 
   const handleFileUpload = async (e) => {
@@ -186,6 +323,207 @@ const AdminDashboard = () => {
     }
   };
 
+  const renderLocalizedInputs = (item, index, field) => (
+    <div className="grid gap-4 md:grid-cols-2">
+      {['es', 'en'].map((language) => (
+        <div key={`${field}-${language}`}>
+          <label className="mb-2 block text-sm font-medium text-gray-300">
+            {getFieldLabel(field)} ({getFieldLabel(language)})
+          </label>
+          <input
+            type="text"
+            value={item[field]?.[language] || ''}
+            onChange={(e) => updateLocalizedField(index, field, language, e.target.value)}
+            className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+          />
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderTechnologiesEditor = () => {
+    const items = content?.technologies?.items || [];
+
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-white">Technology List</h3>
+            <p className="text-sm text-gray-400">Add, remove, or rename the skills shown on the portfolio.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => updateTechnologies([...items, ''])}
+            className="rounded-full border border-primary/30 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+          >
+            Add technology
+          </button>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {items.map((item, index) => (
+            <div key={`${item}-${index}`} className="flex gap-2">
+              <input
+                type="text"
+                value={item}
+                onChange={(e) => updateTechnologies(items.map((entry, entryIndex) => (
+                  entryIndex === index ? e.target.value : entry
+                )))}
+                className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                placeholder="Technology name"
+              />
+              <button
+                type="button"
+                onClick={() => updateTechnologies(items.filter((_, entryIndex) => entryIndex !== index))}
+                className="rounded-xl border border-red-500/30 px-3 text-red-300 transition-colors hover:bg-red-500/10"
+                aria-label="Remove technology"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderExperienceEditor = () => {
+    const items = Array.isArray(content?.experience) ? content.experience : [];
+
+    return (
+      <div className="space-y-5">
+        {items.map((item, index) => (
+          <div key={`${item.company}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Experience #{index + 1}</h3>
+                <p className="text-sm text-gray-400">Company, role, dates, and responsibilities.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeArrayItem(index)}
+                className="rounded-xl border border-red-500/30 px-3 py-2 text-red-300 transition-colors hover:bg-red-500/10"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-5">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">Company</label>
+                <input
+                  type="text"
+                  value={item.company || ''}
+                  onChange={(e) => updateArrayItem(index, (current) => ({ ...current, company: e.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                />
+              </div>
+              {renderLocalizedInputs(item, index, 'position')}
+              {renderLocalizedInputs(item, index, 'period')}
+              <div className="grid gap-5 md:grid-cols-2">
+                {['es', 'en'].map((language) => (
+                  <div key={`responsibilities-${language}`} className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <label className="block text-sm font-medium text-gray-300">
+                        Responsibilities ({getFieldLabel(language)})
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => addLocalizedListField(index, 'responsibilities', language)}
+                        className="rounded-full border border-primary/30 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {(item.responsibilities?.[language] || []).map((responsibility, listIndex) => (
+                      <div key={`${language}-${listIndex}`} className="flex gap-2">
+                        <textarea
+                          value={responsibility}
+                          onChange={(e) => updateLocalizedListField(index, 'responsibilities', language, listIndex, e.target.value)}
+                          className="min-h-20 w-full resize-y rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeLocalizedListField(index, 'responsibilities', language, listIndex)}
+                          className="self-start rounded-xl border border-red-500/30 px-3 py-3 text-red-300 transition-colors hover:bg-red-500/10"
+                          aria-label="Remove responsibility"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => addArrayItem({ company: '', position: { es: '', en: '' }, period: { es: '', en: '' }, responsibilities: { es: [''], en: [''] } })}
+          className="w-full rounded-2xl border border-dashed border-primary/40 px-4 py-4 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+        >
+          Add experience
+        </button>
+      </div>
+    );
+  };
+
+  const renderSimpleLocalizedArrayEditor = (config) => {
+    const items = Array.isArray(content?.[activeTab]) ? content[activeTab] : [];
+
+    return (
+      <div className="space-y-5">
+        {items.map((item, index) => (
+          <div key={`${activeTab}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold text-white">{config.itemLabel} #{index + 1}</h3>
+                <p className="text-sm text-gray-400">Edit the Spanish and English labels shown publicly.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeArrayItem(index)}
+                className="rounded-xl border border-red-500/30 px-3 py-2 text-red-300 transition-colors hover:bg-red-500/10"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-5">
+              {config.fields.map((field) => renderLocalizedInputs(item, index, field))}
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => addArrayItem(config.createItem())}
+          className="w-full rounded-2xl border border-dashed border-primary/40 px-4 py-4 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+        >
+          Add {config.itemLabel.toLowerCase()}
+        </button>
+      </div>
+    );
+  };
+
+  const renderGuidedEditor = () => {
+    if (activeTab === 'technologies') return renderTechnologiesEditor();
+    if (activeTab === 'experience') return renderExperienceEditor();
+    if (activeTab === 'certifications') {
+      return renderSimpleLocalizedArrayEditor({
+        itemLabel: 'Certification',
+        fields: ['name', 'issuer'],
+        createItem: () => ({ name: { es: '', en: '' }, issuer: { es: '', en: '' } }),
+      });
+    }
+    if (activeTab === 'languages') {
+      return renderSimpleLocalizedArrayEditor({
+        itemLabel: 'Language',
+        fields: ['name', 'level'],
+        createItem: () => ({ name: { es: '', en: '' }, level: { es: '', en: '' } }),
+      });
+    }
+
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -199,18 +537,18 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(255,71,147,0.18),transparent_32rem),linear-gradient(135deg,#0d0d0f_0%,#17171b_55%,#0b0b0d_100%)] text-white">
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700 sticky top-0 z-40">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-gray-950/75 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary">marioscorner</p>
             <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-            <p className="text-sm text-gray-400">Manage your portfolio content</p>
           </div>
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-white transition-colors hover:border-primary/60 hover:bg-primary/10"
           >
             <LogOut className="w-4 h-4" />
             Logout
@@ -247,23 +585,23 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-2xl shadow-black/20 backdrop-blur">
               <h2 className="text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wide">
                 Sections
               </h2>
               <nav className="space-y-2">
-                {['hero', 'about', 'status', 'contact', 'featured', 'technologies', 'experience', 'certifications', 'languages', 'projects', 'uploads'].map(
+                {tabs.map(
                   (tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`w-full text-left px-4 py-2 rounded-lg transition-colors capitalize ${
+                      className={`w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-all ${
                         activeTab === tab
-                          ? 'bg-primary text-white'
-                          : 'text-gray-400 hover:bg-gray-700'
+                          ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                          : 'text-gray-400 hover:bg-white/5 hover:text-white'
                       }`}
                     >
-                      {tab}
+                      {sectionLabels[tab] || tab}
                     </button>
                   )
                 )}
@@ -273,14 +611,17 @@ const AdminDashboard = () => {
 
           {/* Content Editor */}
           <div className="lg:col-span-3">
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white capitalize">{activeTab}</h2>
+            <div className="rounded-3xl border border-white/10 bg-gray-950/60 p-6 shadow-2xl shadow-black/30 backdrop-blur">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-500">Editing</p>
+                  <h2 className="text-2xl font-bold text-white">{sectionLabels[activeTab] || activeTab}</h2>
+                </div>
                 {activeTab !== 'uploads' && (
                   <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg"
+                    className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-white hover:bg-primary/90"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Saving...' : 'Save Changes'}
@@ -397,48 +738,120 @@ const AdminDashboard = () => {
                 </div>
               ) : (
                 /* Regular Content Editor */
-                <div className="space-y-4">
-                  {content[activeTab] && typeof content[activeTab] === 'object' ? (
-                    <div className="space-y-4">
+                <div className="space-y-5">
+                  {renderGuidedEditor() || (content[activeTab] && typeof content[activeTab] === 'object' ? (
+                    <div className="space-y-5">
                       {Object.entries(content[activeTab]).map(([key, value]) => (
-                        <div key={key}>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 capitalize">
-                            {key}
-                          </label>
-                          {typeof value === 'string' ? (
-                            value.length > 100 ? (
-                              <textarea
-                                value={value}
-                                onChange={(e) => updateContent(key, e.target.value)}
-                                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary transition-colors resize-none h-24"
-                              />
-                            ) : (
-                              <input
-                                type="text"
-                                value={value}
-                                onChange={(e) => updateContent(key, e.target.value)}
-                                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary transition-colors"
-                              />
-                            )
+                        <div key={key} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+                          {key === 'indicatorColor' && typeof value === 'string' ? (
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                  <Palette className="h-5 w-5" />
+                                </div>
+                                <div>
+                                  <label htmlFor="indicatorColor" className="block text-sm font-semibold text-white">
+                                    {getFieldLabel(key)}
+                                  </label>
+                                  <p className="text-sm text-gray-400">Controls the little pulsing dot in the public Status card.</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                <input
+                                  id="indicatorColor"
+                                  type="color"
+                                  value={value}
+                                  onChange={(e) => updateContent(key, e.target.value)}
+                                  className="h-12 w-20 cursor-pointer rounded-xl border border-white/10 bg-gray-900 p-1"
+                                />
+                                <input
+                                  type="text"
+                                  value={value}
+                                  onChange={(e) => updateContent(key, e.target.value)}
+                                  className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary sm:max-w-xs"
+                                  placeholder="#22c55e"
+                                />
+                                <span className="relative flex h-4 w-4 shrink-0">
+                                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ backgroundColor: value }}></span>
+                                  <span className="relative inline-flex h-4 w-4 rounded-full" style={{ backgroundColor: value }}></span>
+                                </span>
+                              </div>
+                            </div>
+                          ) : typeof value === 'object' && value && !Array.isArray(value) && ['es', 'en'].includes(key) ? (
+                            <div className="space-y-4">
+                              <div>
+                                <h3 className="text-lg font-semibold text-white">{getFieldLabel(key)}</h3>
+                                <p className="text-sm text-gray-400">Edit this section's public copy without touching JSON.</p>
+                              </div>
+                              <div className="grid gap-4">
+                                {Object.entries(value).map(([nestedKey, nestedValue]) => (
+                                  <div key={nestedKey}>
+                                    <label className="mb-2 block text-sm font-medium text-gray-300">
+                                      {getFieldLabel(nestedKey)}
+                                    </label>
+                                    {typeof nestedValue === 'string' && isLongText(nestedKey, nestedValue) ? (
+                                      <textarea
+                                        value={nestedValue}
+                                        onChange={(e) => updateNestedContent(key, nestedKey, e.target.value)}
+                                        className="min-h-28 w-full resize-y rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                                      />
+                                    ) : (
+                                      <input
+                                        type="text"
+                                        value={String(nestedValue)}
+                                        onChange={(e) => updateNestedContent(key, nestedKey, e.target.value)}
+                                        className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                                      />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : typeof value === 'string' ? (
+                            <div>
+                              <label className="mb-2 block text-sm font-medium text-gray-300">
+                                {getFieldLabel(key)}
+                              </label>
+                              {isLongText(key, value) ? (
+                                <textarea
+                                  value={value}
+                                  onChange={(e) => updateContent(key, e.target.value)}
+                                  className="min-h-28 w-full resize-y rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                                />
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={value}
+                                  onChange={(e) => updateContent(key, e.target.value)}
+                                  className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                                />
+                              )}
+                            </div>
                           ) : (
-                            <textarea
-                              value={JSON.stringify(value, null, 2)}
-                              onChange={(e) => {
-                                try {
-                                  updateContent(key, JSON.parse(e.target.value));
-                                } catch {
-                                  // Invalid JSON, just update the string
-                                }
-                              }}
-                              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary transition-colors resize-none h-32 font-mono text-sm"
-                            />
+                            <div>
+                              <label className="mb-2 block text-sm font-medium text-gray-300">
+                                {getFieldLabel(key)}
+                              </label>
+                              <p className="mb-3 text-sm text-gray-500">Advanced editor for lists and complex content.</p>
+                              <textarea
+                                value={JSON.stringify(value, null, 2)}
+                                onChange={(e) => {
+                                  try {
+                                    updateContent(key, JSON.parse(e.target.value));
+                                  } catch {
+                                    // Keep the previous value until the JSON is valid.
+                                  }
+                                }}
+                                className="h-40 w-full resize-y rounded-xl border border-white/10 bg-gray-950 px-4 py-3 font-mono text-sm text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                              />
+                            </div>
                           )}
                         </div>
                       ))}
                     </div>
                   ) : (
                     <p className="text-gray-400">No editable content for this section.</p>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
