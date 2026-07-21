@@ -1,8 +1,17 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
 
-const ContentContext = createContext();
+type ContentContextValue = {
+  // Content sections are JSONB and their editable shape varies by section.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content: Record<string, any> | null;
+  loading: boolean;
+  error: string | null;
+  refreshContent: () => Promise<void>;
+};
 
-export const ContentProvider = ({ children }) => {
+const ContentContext = createContext<ContentContextValue | null>(null);
+
+export const ContentProvider = ({ children }: { children: React.ReactNode }) => {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

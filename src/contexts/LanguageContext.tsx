@@ -4,7 +4,7 @@ import { Language, translations } from "@/lib/translations";
 type LanguageContextType = {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: typeof translations.es;
+  t: (typeof translations)[Language];
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -47,4 +47,3 @@ export const useLanguage = () => {
   }
   return context;
 };
-

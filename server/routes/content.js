@@ -19,6 +19,29 @@ const mergeDefaults = (defaults, content) => {
   }, {});
 };
 
+const isSafeExternalUrl = (value) => {
+  if (typeof value !== 'string') return false;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+};
+
+const getValidationError = (section, data) => {
+  if (['featured', 'projects'].includes(section) && !isSafeExternalUrl(data?.url)) {
+    return 'Target URL must use http:// or https://';
+  }
+
+  if (section === 'social' && (!Array.isArray(data) || data.some((link) => !isSafeExternalUrl(link?.url)))) {
+    return 'Every social link must use http:// or https://';
+  }
+
+  return null;
+};
+
 // GET /api/content
 // Public route - get all content
 router.get('/', async (req, res) => {
@@ -61,6 +84,11 @@ router.put('/:id', requireAuth, async (req, res) => {
     
     if (!data) {
       return res.status(400).json({ error: 'Data is required' });
+    }
+
+    const validationError = getValidationError(req.params.id, data);
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
     }
     
     await setContent(req.params.id, data);

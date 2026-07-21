@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { FileText, Hand } from "lucide-react";
-import { FaLinkedin } from "react-icons/fa6";
+import { FileText, Globe2, Hand } from "lucide-react";
+import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa6";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useContent } from "@/contexts/ContentContext";
 
@@ -8,30 +8,39 @@ const HeroSection = () => {
   const { language } = useLanguage();
   const { content } = useContent();
   const [uploadedCvUrl, setUploadedCvUrl] = useState("");
+  const [uploadedHeroPhotoUrl, setUploadedHeroPhotoUrl] = useState("");
 
   useEffect(() => {
     let ignore = false;
 
-    const fetchUploadedCv = async () => {
+    const fetchUploads = async () => {
       try {
-        const response = await fetch(`/api/uploads?language=${language}`);
+        const response = await fetch("/api/uploads");
         if (!response.ok) throw new Error("Failed to fetch uploads");
 
         const uploads = await response.json();
-        const cvUpload = Array.isArray(uploads)
-          ? uploads.find((upload) => upload.document_type === "cv")
-          : null;
+        const uploadList = Array.isArray(uploads) ? uploads : [];
+        const cvUpload = uploadList.find((upload) => upload.slot === `cv-${language}`)
+          || uploadList.find((upload) => upload.document_type === "cv" && upload.language === language);
+        const heroPhotoUpload = uploadList.find((upload) => upload.slot === "hero-photo");
+        const getVersionedUrl = (upload) => {
+          const cacheKey = upload?.updated_at || upload?.created_at || "";
+          return upload?.url ? `${upload.url}${cacheKey ? `?v=${encodeURIComponent(cacheKey)}` : ""}` : "";
+        };
 
         if (!ignore) {
-          const cacheKey = cvUpload?.updated_at || cvUpload?.created_at || cvUpload?.uploaded_at || "";
-          setUploadedCvUrl(cvUpload?.url ? `${cvUpload.url}${cacheKey ? `?v=${encodeURIComponent(cacheKey)}` : ""}` : "");
+          setUploadedCvUrl(getVersionedUrl(cvUpload));
+          setUploadedHeroPhotoUrl(getVersionedUrl(heroPhotoUpload));
         }
       } catch (error) {
-        if (!ignore) setUploadedCvUrl("");
+        if (!ignore) {
+          setUploadedCvUrl("");
+          setUploadedHeroPhotoUrl("");
+        }
       }
     };
 
-    fetchUploadedCv();
+    fetchUploads();
 
     return () => {
       ignore = true;
@@ -44,8 +53,10 @@ const HeroSection = () => {
 
   const heroData = content.hero?.[language] || {};
   const socialLinks = content.social || [];
+  const socialIcons = { FaLinkedin, FaGithub, FaInstagram, Globe2 };
 
   const cvUrl = uploadedCvUrl || (language === "es" ? "/cv-es.pdf" : "/cv-en.pdf");
+  const heroPhotoUrl = uploadedHeroPhotoUrl || "/MY_PHOTO.webp";
 
   return (
     <div className="bento-card flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
@@ -66,7 +77,7 @@ const HeroSection = () => {
         {/* Social Icons + CV */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
           {socialLinks.map((link) => {
-            const IconComponent = link.icon === "FaLinkedin" ? FaLinkedin : FaLinkedin;
+            const IconComponent = socialIcons[link.icon] || Globe2;
             return (
               <a
                 key={link.name}
@@ -94,10 +105,10 @@ const HeroSection = () => {
       <div className="shrink-0">
         <div className="h-28 w-28 overflow-hidden rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 sm:h-32 sm:w-32">
           <picture>
-            <source srcSet="/MY_PHOTO.webp" type="image/webp" />
+            <source srcSet={heroPhotoUrl} type="image/webp" />
             <img
               src="/MY_PHOTO.png"
-              alt="Photo"
+              alt={`Photo of ${heroData.name || "Mario"}`}
               className="h-full w-full object-cover"
               loading="lazy"
               decoding="async"

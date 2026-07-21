@@ -23,10 +23,6 @@ const AboutCard = () => {
         <p className="text-sm text-muted-foreground leading-relaxed">
           {t.about.paragraph2}
         </p>
-
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {t.about.paragraph3}
-        </p>
       </div>
     </div>
   );

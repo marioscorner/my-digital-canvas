@@ -70,6 +70,7 @@ const defaultContent = {
   },
 
   featured: {
+    url: "https://github.com/marioscorner",
     es: {
       title: "Proyecto destacado",
       projectTitle: "Taekwondo Mario Gutiérrez",
@@ -117,14 +118,11 @@ const defaultContent = {
     {
       company: "Quai Technologies",
       startDate: "2025-11",
+      endDate: "2025-12",
       isCurrent: false,
       position: {
         es: "Prácticas de desarrollo full stack",
         en: "Full stack development internship",
-      },
-      period: {
-        es: "Noviembre 2025 – Diciembre 2025",
-        en: "November 2025 – December 2025",
       },
       responsibilities: {
         es: [
@@ -182,6 +180,7 @@ const defaultContent = {
   ],
 
   projects: {
+    url: "https://github.com/marioscorner",
     es: {
       title: "Proyectos",
       description:

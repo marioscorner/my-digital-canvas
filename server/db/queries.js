@@ -33,11 +33,31 @@ const getAllContent = async () => {
 // Upload queries
 const getUploads = async (language) => {
   const query = language
-    ? 'SELECT * FROM uploads WHERE language = $1 ORDER BY created_at DESC'
-    : 'SELECT * FROM uploads ORDER BY created_at DESC';
+    ? 'SELECT * FROM uploads WHERE language = $1 ORDER BY updated_at DESC'
+    : 'SELECT * FROM uploads ORDER BY updated_at DESC';
   const params = language ? [language] : [];
   const result = await pool.query(query, params);
   return result.rows;
+};
+
+const upsertUploadBySlot = async (slot, filename, originalName, mimeType, size, url, language, documentType) => {
+  const result = await pool.query(
+    `INSERT INTO uploads (slot, filename, original_name, mime_type, size, url, language, document_type)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     ON CONFLICT (slot) WHERE slot IS NOT NULL
+     DO UPDATE SET
+       filename = EXCLUDED.filename,
+       original_name = EXCLUDED.original_name,
+       mime_type = EXCLUDED.mime_type,
+       size = EXCLUDED.size,
+       url = EXCLUDED.url,
+       language = EXCLUDED.language,
+       document_type = EXCLUDED.document_type,
+       updated_at = NOW()
+     RETURNING *`,
+    [slot, filename, originalName, mimeType, size, url, language, documentType]
+  );
+  return result.rows[0];
 };
 
 const addUpload = async (filename, originalName, mimeType, size, url, language = 'en', documentType = 'cv') => {
@@ -69,6 +89,7 @@ export {
   setContent,
   getAllContent,
   getUploads,
+  upsertUploadBySlot,
   addUpload,
   deleteUpload,
   logAudit,

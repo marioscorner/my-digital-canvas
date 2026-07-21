@@ -1,7 +1,7 @@
 import { Briefcase } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useContent } from "@/contexts/ContentContext";
-import { formatCurrentExperiencePeriod, sortExperiences } from "@/lib/experience";
+import { formatExperiencePeriod, sortExperiences } from "@/lib/experience";
 
 const ExperienceCard = () => {
   const { t, language } = useLanguage();
@@ -26,9 +26,7 @@ const ExperienceCard = () => {
               </p>
               <p className="text-sm font-medium text-muted-foreground">{job.company}</p>
               <p className="text-xs text-muted-foreground">
-                {job.isCurrent
-                  ? formatCurrentExperiencePeriod(job.startDate, language)
-                  : job.period?.[language]}
+                {formatExperiencePeriod(job, language)}
               </p>
             </div>
             {job.responsibilities?.[language]?.length > 0 && (

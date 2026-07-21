@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, Save, AlertCircle, CheckCircle, Upload, Trash2, Palette } from 'lucide-react';
 import { useContent } from '@/contexts/ContentContext';
-import { isValidExperienceStartDate, sortExperiences } from '@/lib/experience';
+import MonthPicker from '@/components/admin/MonthPicker';
+import { normalizeExperiences, sortExperiences, toStructuredExperiences } from '@/lib/experience';
 
-const tabs = ['hero', 'about', 'status', 'contact', 'featured', 'technologies', 'experience', 'certifications', 'languages', 'projects', 'uploads'];
+const tabs = ['hero', 'about', 'status', 'contact', 'featured', 'technologies', 'experience', 'certifications', 'languages', 'projects', 'social', 'uploads'];
 
 const sectionLabels = {
   hero: 'Hero',
@@ -18,6 +19,7 @@ const sectionLabels = {
   certifications: 'Certifications',
   languages: 'Languages',
   projects: 'Projects',
+  social: 'Social Links',
   uploads: 'Uploads',
 };
 
@@ -29,17 +31,27 @@ const fieldLabels = {
   statusDetail: 'Status details',
   indicatorColor: 'Indicator colour',
   company: 'Company',
+  url: 'Target URL',
   position: 'Position',
   period: 'Period',
   responsibilities: 'Responsibilities',
   name: 'Name',
   issuer: 'Issuer',
   level: 'Level',
+  icon: 'Icon',
 };
 
 const getFieldLabel = (key) => fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (letter) => letter.toUpperCase());
 
 const isLongText = (key, value) => value.length > 100 || ['description', 'description2', 'paragraph1', 'paragraph2', 'paragraphFullStack', 'statusDetail', 'cta'].includes(key);
+
+const uploadTargets = [
+  { value: 'cv-es', label: 'CV (Spanish)', accept: 'application/pdf', allowedTypes: ['application/pdf'] },
+  { value: 'cv-en', label: 'CV (English)', accept: 'application/pdf', allowedTypes: ['application/pdf'] },
+  { value: 'hero-photo', label: 'Hero photo', accept: 'image/jpeg,image/png,image/webp', allowedTypes: ['image/jpeg', 'image/png', 'image/webp'] },
+];
+
+const getUploadTarget = (target) => uploadTargets.find((option) => option.value === target);
 
 const createExperience = () => {
   const now = new Date();
@@ -48,9 +60,9 @@ const createExperience = () => {
   return {
     company: '',
     startDate,
+    endDate: '',
     isCurrent: false,
     position: { es: '', en: '' },
-    period: { es: '', en: '' },
     responsibilities: { es: [''], en: [''] },
   };
 };
@@ -66,8 +78,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('hero');
   const [uploads, setUploads] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
-  const [selectedDocType, setSelectedDocType] = useState('cv');
+  const [selectedUploadTarget, setSelectedUploadTarget] = useState('cv-es');
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
@@ -78,7 +89,10 @@ const AdminDashboard = () => {
     try {
       const response = await fetch('/api/content');
       const data = await response.json();
-      setContent(data);
+      setContent({
+        ...data,
+        experience: Array.isArray(data.experience) ? normalizeExperiences(data.experience) : [],
+      });
     } catch (err) {
       showMessage('error', 'Failed to load content');
     }
@@ -125,16 +139,17 @@ const AdminDashboard = () => {
   const handleSave = async () => {
     if (!content) return;
 
-    if (
-      activeTab === 'experience' &&
-      (!Array.isArray(content.experience) || content.experience.some((item) => !isValidExperienceStartDate(item.startDate)))
-    ) {
-      showMessage('error', 'Set a start date for every experience before saving');
+    const experiences = activeTab === 'experience' && Array.isArray(content.experience)
+      ? normalizeExperiences(content.experience)
+      : [];
+
+    if (experiences.some((item) => item.startDate && item.endDate && item.endDate < item.startDate)) {
+      showMessage('error', 'An end date cannot be before its start date');
       return;
     }
 
     const sectionData = activeTab === 'experience'
-      ? sortExperiences(content.experience)
+      ? sortExperiences(toStructuredExperiences(experiences))
       : content[activeTab];
 
     setSaving(true);
@@ -300,10 +315,16 @@ const AdminDashboard = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      showMessage('error', 'Only PDF, JPEG, PNG, and WebP files are allowed');
+    const target = getUploadTarget(selectedUploadTarget);
+    if (!target) {
+      showMessage('error', 'Choose a valid upload target');
+      return;
+    }
+
+    if (!target.allowedTypes.includes(file.type)) {
+      showMessage('error', target.value.startsWith('cv-')
+        ? 'CV uploads must be PDF files'
+        : 'Hero photos must be JPEG, PNG, or WebP files');
       return;
     }
 
@@ -315,8 +336,7 @@ const AdminDashboard = () => {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('language', selectedLanguage);
-    formData.append('documentType', selectedDocType);
+    formData.append('target', target.value);
 
     setUploading(true);
     try {
@@ -331,7 +351,7 @@ const AdminDashboard = () => {
         throw new Error(error.error || 'Upload failed');
       }
 
-      showMessage('success', `${selectedDocType} (${selectedLanguage}) uploaded successfully`);
+      showMessage('success', `${target.label} uploaded successfully`);
       await fetchUploads();
       // Reset file input
       e.target.value = '';
@@ -460,27 +480,41 @@ const AdminDashboard = () => {
                     <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor={`experience-start-date-${index}`}>
                       Start date
                     </label>
-                    <input
+                    <MonthPicker
                       id={`experience-start-date-${index}`}
-                      type="month"
                       value={item.startDate || ''}
-                      onChange={(e) => updateArrayItem(index, (current) => ({ ...current, startDate: e.target.value }))}
-                      required
-                      className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                      onChange={(startDate) => updateArrayItem(index, (current) => ({ ...current, startDate }))}
+                      placeholder="Select start month"
                     />
                   </div>
                   <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-sm font-medium text-gray-300">
                     <input
                       type="checkbox"
                       checked={item.isCurrent === true}
-                      onChange={(e) => updateArrayItem(index, (current) => ({ ...current, isCurrent: e.target.checked }))}
+                      onChange={(e) => updateArrayItem(index, (current) => ({
+                        ...current,
+                        isCurrent: e.target.checked,
+                        endDate: e.target.checked ? '' : current.endDate,
+                      }))}
                       className="h-4 w-4 accent-primary"
                     />
                     Current experience
                   </label>
                 </div>
+                {!item.isCurrent && (
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor={`experience-end-date-${index}`}>
+                      End date
+                    </label>
+                    <MonthPicker
+                      id={`experience-end-date-${index}`}
+                      value={item.endDate || ''}
+                      onChange={(endDate) => updateArrayItem(index, (current) => ({ ...current, endDate }))}
+                      placeholder="Select end month"
+                    />
+                  </div>
+                )}
                 {renderLocalizedInputs(item, index, 'position')}
-                {!item.isCurrent && renderLocalizedInputs(item, index, 'period')}
               <div className="grid gap-5 md:grid-cols-2">
                 {['es', 'en'].map((language) => (
                   <div key={`responsibilities-${language}`} className="space-y-3">
@@ -530,6 +564,74 @@ const AdminDashboard = () => {
     );
   };
 
+  const renderSocialEditor = () => {
+    const items = Array.isArray(content?.social) ? content.social : [];
+
+    return (
+      <div className="space-y-5">
+        {items.map((item, index) => (
+          <div key={`${item.name}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Social link #{index + 1}</h3>
+                <p className="text-sm text-gray-400">Choose the name, destination, and icon shown in the hero.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeArrayItem(index)}
+                className="rounded-xl border border-red-500/30 px-3 py-2 text-red-300 transition-colors hover:bg-red-500/10"
+                aria-label="Remove social link"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">Name</label>
+                <input
+                  type="text"
+                  value={item.name || ''}
+                  onChange={(e) => updateArrayItem(index, (current) => ({ ...current, name: e.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white outline-none transition-colors focus:border-primary"
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">Target URL</label>
+                <input
+                  type="url"
+                  value={item.url || ''}
+                  onChange={(e) => updateArrayItem(index, (current) => ({ ...current, url: e.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white outline-none transition-colors focus:border-primary"
+                  placeholder="https://"
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">Icon</label>
+                <select
+                  value={item.icon || 'Globe2'}
+                  onChange={(e) => updateArrayItem(index, (current) => ({ ...current, icon: e.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white outline-none transition-colors focus:border-primary"
+                >
+                  <option value="FaLinkedin">LinkedIn</option>
+                  <option value="FaGithub">GitHub</option>
+                  <option value="FaInstagram">Instagram</option>
+                  <option value="Globe2">Website</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => addArrayItem({ name: '', url: '', icon: 'Globe2' })}
+          className="w-full rounded-2xl border border-dashed border-primary/40 px-4 py-4 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+        >
+          Add social link
+        </button>
+      </div>
+    );
+  };
+
   const renderSimpleLocalizedArrayEditor = (config) => {
     const items = Array.isArray(content?.[activeTab]) ? content[activeTab] : [];
 
@@ -569,6 +671,7 @@ const AdminDashboard = () => {
   const renderGuidedEditor = () => {
     if (activeTab === 'technologies') return renderTechnologiesEditor();
     if (activeTab === 'experience') return renderExperienceEditor();
+    if (activeTab === 'social') return renderSocialEditor();
     if (activeTab === 'certifications') {
       return renderSimpleLocalizedArrayEditor({
         itemLabel: 'Certification',
@@ -695,43 +798,28 @@ const AdminDashboard = () => {
               {/* Uploads Section */}
               {activeTab === 'uploads' ? (
                 <div className="space-y-6">
-                  {/* Upload Form */}
                   <div className="border-2 border-dashed border-gray-600 rounded-lg p-6">
                     <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Document Type
-                          </label>
-                          <select
-                            value={selectedDocType}
-                            onChange={(e) => setSelectedDocType(e.target.value)}
-                            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
-                          >
-                            <option value="cv">CV</option>
-                            <option value="resume">Resume</option>
-                            <option value="document">Document</option>
-                            <option value="certificate">Certificate</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Language
-                          </label>
-                          <select
-                            value={selectedLanguage}
-                            onChange={(e) => setSelectedLanguage(e.target.value)}
-                            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
-                          >
-                            <option value="en">English</option>
-                            <option value="es">Spanish</option>
-                          </select>
-                        </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Upload target
+                        </label>
+                        <select
+                          value={selectedUploadTarget}
+                          onChange={(e) => setSelectedUploadTarget(e.target.value)}
+                          className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
+                        >
+                          {uploadTargets.map((target) => (
+                            <option key={target.value} value={target.value}>{target.label}</option>
+                          ))}
+                        </select>
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          File (PDF, JPEG, PNG, WebP - Max 10MB)
+                          {selectedUploadTarget.startsWith('cv-')
+                            ? 'CV file (PDF - Max 10MB)'
+                            : 'Hero photo (JPEG, PNG, or WebP - Max 10MB)'}
                         </label>
                         <div className="flex items-center justify-center gap-4">
                           <input
@@ -739,7 +827,7 @@ const AdminDashboard = () => {
                             id="file-input"
                             onChange={handleFileUpload}
                             disabled={uploading}
-                            accept=".pdf,.jpg,.jpeg,.png,.webp"
+                            accept={getUploadTarget(selectedUploadTarget)?.accept}
                             className="hidden"
                           />
                           <label
@@ -765,7 +853,7 @@ const AdminDashboard = () => {
                           <div key={upload.filename} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg border border-gray-600">
                             <div className="flex-1">
                               <p className="font-medium text-white">
-                                {upload.document_type} ({upload.language.toUpperCase()})
+                                {getUploadTarget(upload.slot)?.label || `Legacy: ${upload.document_type} (${upload.language.toUpperCase()})`}
                               </p>
                               <p className="text-sm text-gray-400">
                                 {upload.original_name} • {(upload.size / 1024 / 1024).toFixed(2)} MB
@@ -883,7 +971,7 @@ const AdminDashboard = () => {
                                 />
                               ) : (
                                 <input
-                                  type="text"
+                                  type={key === 'url' ? 'url' : 'text'}
                                   value={value}
                                   onChange={(e) => updateContent(key, e.target.value)}
                                   className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
