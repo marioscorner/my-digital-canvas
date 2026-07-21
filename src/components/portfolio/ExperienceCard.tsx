@@ -1,37 +1,14 @@
 import { Briefcase } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useContent } from "@/contexts/ContentContext";
+import { formatCurrentExperiencePeriod, sortExperiences } from "@/lib/experience";
 
 const ExperienceCard = () => {
   const { t, language } = useLanguage();
-
-  // Editable content - Work Experience
-  const workExperience = [
-    {
-      company: "Quai Technologies",
-      position: {
-        es: "Prácticas de desarrollo full stack",
-        en: "Full stack development internship",
-      },
-      period: {
-        es: "Noviembre 2025 – Diciembre 2025",
-        en: "November 2025 – December 2025",
-      },
-      responsibilities: {
-        es: [
-          "Desarrollo de la aplicación APPUNTO",
-          "Implementación de WAHA para poder utilizar Whatsapp en tiempo real desde la aplicación.",
-          "Trabajo con BB.DD., tanto diseño como mantenimiento.",
-          "Colaboración con el CTO para el diseño de producto, buscando las mejores líneas de desarrollo y evitar problemas futuros.",
-        ],
-        en: [
-          "Development of the app APPUNTO",
-          "Implementing real time Whatsapp messaging in the app using WAHA.",
-          "Work with Databases, both designing and maintaining them.",
-          "Help the CTO in product design, looking to solve problems before we encountered them.",
-        ],
-      },
-    },
-  ];
+  const { content } = useContent();
+  const workExperience = Array.isArray(content?.experience)
+    ? sortExperiences(content.experience)
+    : [];
 
   return (
     <div className="bento-card flex flex-col">
@@ -45,14 +22,16 @@ const ExperienceCard = () => {
           <div key={index} className="space-y-1">
             <div className="flex flex-col gap-0.5">
               <p className="text-base font-semibold text-foreground">
-                {job.position[language]}
+                {job.position?.[language]}
               </p>
               <p className="text-sm font-medium text-muted-foreground">{job.company}</p>
               <p className="text-xs text-muted-foreground">
-                {job.period[language]}
+                {job.isCurrent
+                  ? formatCurrentExperiencePeriod(job.startDate, language)
+                  : job.period?.[language]}
               </p>
             </div>
-            {job.responsibilities && (
+            {job.responsibilities?.[language]?.length > 0 && (
               <div className="mt-2 space-y-1">
                 {job.responsibilities[language].map((responsibility, idx) => (
                   <p

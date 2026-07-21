@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, Save, AlertCircle, CheckCircle, Upload, Trash2, Palette } from 'lucide-react';
+import { useContent } from '@/contexts/ContentContext';
+import { isValidExperienceStartDate, sortExperiences } from '@/lib/experience';
 
 const tabs = ['hero', 'about', 'status', 'contact', 'featured', 'technologies', 'experience', 'certifications', 'languages', 'projects', 'uploads'];
 
@@ -39,8 +41,23 @@ const getFieldLabel = (key) => fieldLabels[key] || key.replace(/([A-Z])/g, ' $1'
 
 const isLongText = (key, value) => value.length > 100 || ['description', 'description2', 'paragraph1', 'paragraph2', 'paragraphFullStack', 'statusDetail', 'cta'].includes(key);
 
+const createExperience = () => {
+  const now = new Date();
+  const startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  return {
+    company: '',
+    startDate,
+    isCurrent: false,
+    position: { es: '', en: '' },
+    period: { es: '', en: '' },
+    responsibilities: { es: [''], en: [''] },
+  };
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { refreshContent } = useContent();
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState(null);
@@ -108,12 +125,24 @@ const AdminDashboard = () => {
   const handleSave = async () => {
     if (!content) return;
 
+    if (
+      activeTab === 'experience' &&
+      (!Array.isArray(content.experience) || content.experience.some((item) => !isValidExperienceStartDate(item.startDate)))
+    ) {
+      showMessage('error', 'Set a start date for every experience before saving');
+      return;
+    }
+
+    const sectionData = activeTab === 'experience'
+      ? sortExperiences(content.experience)
+      : content[activeTab];
+
     setSaving(true);
     try {
       const response = await fetch(`/api/content/${activeTab}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: content[activeTab] }),
+        body: JSON.stringify({ data: sectionData }),
         credentials: 'include',
       });
 
@@ -121,6 +150,11 @@ const AdminDashboard = () => {
         throw new Error('Failed to save');
       }
 
+      setContent((currentContent) => ({
+        ...currentContent,
+        [activeTab]: sectionData,
+      }));
+      await refreshContent();
       showMessage('success', 'Content saved successfully');
     } catch (err) {
       showMessage('error', 'Failed to save content');
@@ -206,6 +240,11 @@ const AdminDashboard = () => {
     if (!Array.isArray(currentSection)) return;
 
     setActiveSection([...currentSection, item]);
+  };
+
+  const addExperience = () => {
+    const experiences = Array.isArray(content?.experience) ? content.experience : [];
+    setActiveSection([createExperience(), ...experiences]);
   };
 
   const removeArrayItem = (index) => {
@@ -406,18 +445,42 @@ const AdminDashboard = () => {
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-            <div className="space-y-5">
-              <div>
+              <div className="space-y-5">
+                <div>
                 <label className="mb-2 block text-sm font-medium text-gray-300">Company</label>
                 <input
                   type="text"
                   value={item.company || ''}
                   onChange={(e) => updateArrayItem(index, (current) => ({ ...current, company: e.target.value }))}
                   className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
-                />
-              </div>
-              {renderLocalizedInputs(item, index, 'position')}
-              {renderLocalizedInputs(item, index, 'period')}
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-300" htmlFor={`experience-start-date-${index}`}>
+                      Start date
+                    </label>
+                    <input
+                      id={`experience-start-date-${index}`}
+                      type="month"
+                      value={item.startDate || ''}
+                      onChange={(e) => updateArrayItem(index, (current) => ({ ...current, startDate: e.target.value }))}
+                      required
+                      className="w-full rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-primary"
+                    />
+                  </div>
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-gray-900/80 px-4 py-3 text-sm font-medium text-gray-300">
+                    <input
+                      type="checkbox"
+                      checked={item.isCurrent === true}
+                      onChange={(e) => updateArrayItem(index, (current) => ({ ...current, isCurrent: e.target.checked }))}
+                      className="h-4 w-4 accent-primary"
+                    />
+                    Current experience
+                  </label>
+                </div>
+                {renderLocalizedInputs(item, index, 'position')}
+                {!item.isCurrent && renderLocalizedInputs(item, index, 'period')}
               <div className="grid gap-5 md:grid-cols-2">
                 {['es', 'en'].map((language) => (
                   <div key={`responsibilities-${language}`} className="space-y-3">
@@ -458,7 +521,7 @@ const AdminDashboard = () => {
         ))}
         <button
           type="button"
-          onClick={() => addArrayItem({ company: '', position: { es: '', en: '' }, period: { es: '', en: '' }, responsibilities: { es: [''], en: [''] } })}
+          onClick={addExperience}
           className="w-full rounded-2xl border border-dashed border-primary/40 px-4 py-4 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
         >
           Add experience

@@ -116,6 +116,8 @@ const defaultContent = {
   experience: [
     {
       company: "Quai Technologies",
+      startDate: "2025-11",
+      isCurrent: false,
       position: {
         es: "Prácticas de desarrollo full stack",
         en: "Full stack development internship",
